@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#160653"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="ClientFlow"><link rel="manifest" href="/manifest.json"><title>ClientFlow CRM</title>
+
+<style>
+:root{--navy:#160653;--deep:#0F0440;--blue:#5038A5;--tint:#F1EEFA;--bg:#F4F2FB;--bd:#E2E8F0;--tx:#172033;--mut:#64748B;--ok:#16A34A;--warn:#F59E0B;--err:#DC2626}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 Inter,system-ui,sans-serif}
+header{background:var(--navy);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:5}
+header h1{font-size:17px;margin:0;flex:1}header small{opacity:.7}
+main{padding:12px 12px calc(84px + env(safe-area-inset-bottom));max-width:980px;margin:0 auto}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;background:none;border:0;padding:8px 0;color:var(--mut);font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button i{font-style:normal;font-size:19px}nav button.on{color:var(--blue);font-weight:600}
+.card,.lead{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.kpis .card{margin:0}.kpis b{font-size:22px;display:block;color:var(--navy)}
+.lead{display:flex;gap:10px;align-items:center;cursor:pointer;flex-wrap:wrap}.lead:active{background:var(--tint)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:600;flex-shrink:0}
+.mid{flex:1;min-width:150px}.mid b{display:block}small,.mut{color:var(--mut);font-size:12px}.over{color:var(--err);font-weight:600}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;background:#E2E8F0;color:var(--deep);font-size:12px;margin:2px 4px 2px 0}
+.badge.ok{background:#DCFCE7;color:#166534}.badge.bad{background:#FEE2E2;color:#991B1B}.badge.warn{background:#FEF3C7;color:#92400E}.badge.blue{background:var(--tint);color:#1D4ED8}
+input,select,textarea{width:100%;border:1px solid var(--bd);border-radius:8px;padding:10px;font:inherit;font-size:16px;background:#fff;color:var(--tx);margin-bottom:8px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.g{background:#fff;color:var(--tx);border:1px solid var(--bd);padding:6px 10px;font-size:13px}.btn.w{width:100%}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}.chips .btn{white-space:nowrap}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.bar{height:8px;background:var(--blue);border-radius:4px}
+.sheet{position:fixed;inset:0;background:rgba(11,27,56,.45);display:none;align-items:flex-end;z-index:20}.sheet.on{display:flex}
+.sheet>div{background:#fff;width:100%;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.tl{border-left:2px solid var(--bd);margin-left:6px;padding-left:12px}.tl div{margin-bottom:10px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));background:var(--deep);color:#fff;padding:9px 14px;border-radius:8px;display:none;z-index:30;max-width:90%}
+.login{max-width:380px;margin:10vh auto}.err{color:var(--err)}
+@media(min-width:800px){
+nav{top:0;bottom:0;right:auto;width:190px;flex-direction:column;background:var(--navy);border:0;padding:70px 8px 0}
+nav button{flex:none;flex-direction:row;gap:10px;color:#cbd5e1;padding:10px;font-size:14px;border-radius:8px;justify-content:flex-start}nav button.on{background:var(--deep);color:#fff}
+.shell{margin-left:190px}.kpis{grid-template-columns:repeat(4,1fr)}
+.sheet{align-items:stretch;justify-content:flex-end}.sheet>div{width:460px;max-height:none;border-radius:0}#toast{bottom:24px}}
+
+.auth{min-height:100vh;display:grid;grid-template-columns:1fr}
+.aleft{background:#160653;color:#fff;padding:24px;display:flex;flex-direction:column;gap:18px}
+.logo{font-size:24px;font-weight:700}.logo b{color:#B9A7FF}.tag{margin:0;opacity:.85}
+.slide{padding:16px}.tcard{background:#fff;color:var(--tx);border-radius:16px;padding:0;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab}
+.track{display:flex;transition:transform .35s ease}.slide{min-width:100%}.slide p{margin:6px 0 12px}
+.stars{color:#F59E0B;margin-top:8px}.tnav{display:flex;gap:10px;align-items:center;justify-content:center}
+.tnav button{border:0;background:none;color:var(--blue);font-size:18px;cursor:pointer}.tnav .dot{width:9px;height:9px;border-radius:50%;background:#D5CCF2;padding:0}.tnav .dot.on{background:var(--blue)}
+.demo{display:block;text-align:center;color:var(--mut)}.conn{text-align:center}.conn div{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;justify-content:center}.conn span{background:rgba(255,255,255,.12);padding:6px 12px;border-radius:20px}.conn .ico span{background:#fff;width:46px;height:46px;border-radius:50%;padding:0;display:grid;place-items:center}
+.aright{background:#EEEAF8;padding:20px;display:flex;flex-direction:column;justify-content:center}
+.acard{background:#fff;border-radius:16px;padding:24px;max-width:440px;width:100%;margin:0 auto;box-shadow:0 8px 30px rgba(22,6,83,.1)}
+.acard h2{margin:0 0 4px;color:var(--navy)}.acard label{display:block;font-weight:600;margin:10px 0 4px}.acard input,.acard select,.acard textarea{margin-bottom:2px}
+.pw{display:flex;gap:6px;align-items:center}.cc{padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--tint)}.chk{font-weight:400!important}.chk input{width:auto;margin:0 6px 0 0}
+.row .btn.w{flex:1}.or{display:flex;align-items:center;gap:8px;color:var(--mut);margin:14px 0}.or:before,.or:after{content:"";flex:1;height:1px;background:var(--bd)}
+.note{background:#FEF3C7;color:#92400E;padding:8px 10px;border-radius:8px}.okm{color:var(--ok)}.err{color:var(--err)}.acard small.err{display:block;font-weight:600;margin:2px 0 4px}
+.otop{display:flex;justify-content:space-between;align-items:center;max-width:440px;width:100%;margin:0 auto 12px;gap:8px}.steps i{display:inline-block;width:28px;height:6px;border-radius:3px;background:#D5CCF2;margin-right:4px}.steps i.on{background:var(--blue)}
+@media(min-width:900px){.auth{grid-template-columns:1fr 1fr}.aleft{padding:40px;justify-content:space-between}.aright{padding:40px}}
+/* ===== ClientFlow app shell ===== */
+.side{position:fixed;top:0;bottom:0;left:0;width:250px;background:#16094F;color:#fff;overflow:auto;z-index:15;padding:14px 10px;transition:transform .25s}
+.side .lg{display:flex;gap:10px;align-items:center;padding:4px 6px 14px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:6px}.side .lg i{width:36px;height:36px;border-radius:10px;background:#5137A8;display:grid;place-items:center;font-style:normal}.side .lg b{display:block}.side .lg small{color:#B9A7FF}
+.side h6{margin:14px 8px 4px;font-size:11px;letter-spacing:.06em;color:#B9A7FF;font-weight:600}
+.side button{display:flex;gap:10px;align-items:center;width:100%;background:none;border:0;color:#E5E0FA;padding:10px;border-radius:8px;font:inherit;cursor:pointer;text-align:left}.side button:hover{background:rgba(255,255,255,.08)}.side button.on{background:#4A35A0;color:#fff;font-weight:600}
+.shell{margin-left:0}.shell header{background:#fff;color:var(--tx);border-bottom:1px solid var(--bd)}.shell header h1{font-size:18px}.shell header .btn.g{padding:7px 11px}
+#mb{display:inline-block}.shell main{max-width:1280px;padding:20px 16px 40px}
+@media(min-width:900px){.shell{margin-left:250px}#mb{display:none}.shell main{padding:24px 28px 48px}}
+@media(max-width:899px){.side{transform:translateX(-100%)}.side.open{transform:none;box-shadow:0 0 0 100vmax rgba(11,27,56,.45)}}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}.kp b{font-size:24px;display:block;color:var(--navy);margin:2px 0}.kp.ok b{color:var(--ok)}.kp.er b{color:var(--err)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-bottom:12px}.grid .card{margin:0}
+.card{border-radius:14px}.card h3{margin:0 0 10px;font-size:15px}.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}.ph h2{margin:0;font-size:20px;color:var(--navy)}
+.br{display:grid;grid-template-columns:110px 1fr 34px;gap:8px;align-items:center;margin:7px 0;font-size:12px}.br div{background:#EEEAF8;border-radius:5px;height:9px}.br i{display:block;height:9px;border-radius:5px;background:#5137A8}.br b{text-align:right}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.flt input,.flt select{width:auto;flex:1;min-width:130px;margin:0;padding:8px;font-size:14px}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--bd);border-radius:14px}.tbl{width:100%;border-collapse:collapse}.tbl th{position:sticky;top:0;background:#F8F7FD;text-align:left;font-size:12px;color:var(--mut);padding:9px 10px;white-space:nowrap}.tbl td{padding:8px 10px;border-top:1px solid #EEE;vertical-align:middle}.tbl tr:hover td{background:#FAF9FE}.tbl input[type=checkbox]{width:auto;margin:0}.ia{border:0;background:none;cursor:pointer;font-size:16px;padding:3px;text-decoration:none}
+@media(max-width:799px){.tbl thead{display:none}.tbl tr{display:block;border:1px solid var(--bd);border-radius:12px;margin:8px;padding:6px}.tbl td{display:inline-block;border:0;padding:3px 6px}.tbl td:nth-child(2){display:block;font-size:15px}}
+.bulk{background:var(--tint);border:1px solid #D5CCF2;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn.g.on{background:var(--blue);color:#fff;border-color:var(--blue)}.btn:disabled{opacity:.5}
+.sw{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}.sw input{opacity:0;width:0;height:0;margin:0}.sw i{position:absolute;inset:0;background:#CBD5E1;border-radius:12px;cursor:pointer;transition:.2s}.sw i:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.sw input:checked+i{background:#5137A8}.sw input:checked+i:before{transform:translateX(18px)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(130px,1fr));gap:0;border:1px solid var(--bd);border-radius:14px;background:#fff;overflow-x:auto}.cal>div{border-right:1px solid #EEE;min-height:200px;padding:6px}.cal>div:last-child{border:0}.cal h5{margin:0 0 8px;text-align:center;font-size:13px;padding:6px 0;border-bottom:1px solid #EEE}.cal h5.td{color:var(--blue)}
+.ev{border:1px solid var(--bd);border-left:4px solid var(--c);border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:12px;cursor:pointer;background:#fff}.ev b{display:block;font-size:13px}.ev.od{background:#FEF2F2;border-color:#FCA5A5;border-left-color:var(--err)}.ev.dn{opacity:.55}.ev time{color:var(--c);font-weight:600}
+.tl2{border-left:2px solid #D5CCF2;margin-left:14px;padding-left:22px}.tl2>div{position:relative;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:10px}.tl2>div:before{content:attr(data-i);position:absolute;left:-42px;top:8px;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #D5CCF2;display:grid;place-items:center;font-size:14px}
+.stp{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.stp span{padding:5px 12px;border-radius:20px;background:#E9E5F7;font-size:12px}.stp .on{background:var(--blue);color:#fff}.stp .dn{background:#DCFCE7;color:#166534}
+.row2{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #EEE}.row2:first-of-type{border:0}
+details.card summary{cursor:pointer;font-weight:600}details.card[open] summary{margin-bottom:10px}
+.pill{display:inline-block;background:var(--tint);border-radius:14px;padding:3px 10px;margin:3px;font-size:13px}.pill a{color:var(--err);margin-left:6px;cursor:pointer}
+code,pre.code{background:#F1EEFA;border-radius:8px;padding:8px;display:block;overflow:auto;font-size:12px;white-space:pre-wrap;word-break:break-all}
+.prg{height:8px;background:#EEEAF8;border-radius:4px;min-width:70px}.prg i{display:block;height:8px;border-radius:4px;background:#16A34A}
+.big{font-size:30px;font-weight:700;color:var(--navy)}
+ #dlg{display:none;position:fixed;inset:0;background:rgba(11,27,56,.5);z-index:60;align-items:center;justify-content:center}#dlg.on{display:flex}.dbox{background:#fff;border-radius:14px;padding:22px;max-width:340px;width:90%;text-align:center}.dbox p{margin:0 0 16px;font-size:16px;font-weight:600;color:var(--navy)}.dbox .acts{justify-content:center}.dbox .btn{min-width:90px}
+
+/* ===== Mobile app mode (<900px). Desktop (>=900px) is untouched ===== */
+html{-webkit-text-size-adjust:100%}
+.bnav,.side .sfoot,.mt{display:none}
+@media(max-width:899px){
+body{overflow-x:hidden;overscroll-behavior-y:none;padding-bottom:0;touch-action:manipulation}
+.shell header{padding:calc(10px + env(safe-area-inset-top)) 14px 10px;min-height:54px;box-shadow:0 1px 0 var(--bd)}
+.shell header .dt{display:none}.shell header .mt{display:block;font-size:19px;font-weight:700;color:var(--navy);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shell header h1{flex:1;min-width:0}.shell header>.mut,.shell header>.btn.g:last-child,#mb{display:none}
+.shell main{padding:12px 12px calc(86px + env(safe-area-inset-bottom))}
+.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:12;background:#fff;border-top:1px solid var(--bd);padding:0 4px env(safe-area-inset-bottom);box-shadow:0 -4px 16px rgba(22,6,83,.07)}
+.bnav button{flex:1;background:none;border:0;padding:8px 2px 7px;color:var(--mut);font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-height:56px;position:relative}
+.bnav button span{font-size:21px;line-height:1.1;filter:grayscale(1);opacity:.7;transition:transform .15s}
+.bnav button.on{color:var(--blue);font-weight:700}.bnav button.on span{filter:none;opacity:1;transform:translateY(-1px)}
+.bnav button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--blue)}
+.bnav button:active{background:var(--tint)}
+.side{width:min(86vw,300px);padding-top:calc(14px + env(safe-area-inset-top))}
+.side button{padding:13px 10px}
+.side .sfoot{display:block;margin-top:16px;padding:12px 8px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.12)}
+.side .sfoot small{display:block;color:#B9A7FF;margin-bottom:8px}
+.side .sfoot button{background:rgba(255,255,255,.1);justify-content:center;font-weight:600}
+#toast{bottom:calc(78px + env(safe-area-inset-bottom));width:max-content}
+.kpis{grid-template-columns:1fr 1fr!important;gap:8px}
+.kp b{font-size:22px}
+.grid{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.ph h2{font-size:19px}.ph{margin-bottom:10px}
+.flt{gap:6px}.flt input,.flt select{flex:1 1 calc(50% - 6px);min-width:0;font-size:16px;padding:10px}.flt input[type=search],.flt input:first-child{flex-basis:100%}
+.btn,.btn.g{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+.btn.g{padding:8px 12px}
+.ia{padding:8px;font-size:18px}
+.chips{scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-left:-12px;margin-right:-12px;padding:0 12px 4px}.chips::-webkit-scrollbar{display:none}
+.card,.lead{padding:14px;border-radius:16px}
+.lead{box-shadow:0 1px 3px rgba(22,6,83,.06)}
+.mid{min-width:0}
+.br{grid-template-columns:84px 1fr 30px}
+.cal{grid-template-columns:repeat(7,78vw);scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.cal>div{scroll-snap-align:start;min-height:160px}
+.tw{border-radius:16px}
+.bulk{position:sticky;top:60px;z-index:4}
+.sheet>div{border-radius:20px 20px 0 0;max-height:94vh;padding-top:22px;position:relative;-webkit-overflow-scrolling:touch}
+.sheet>div:before{content:"";position:absolute;top:8px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:#CBD5E1}
+.stp{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.stp span{white-space:nowrap}
+.tl2{margin-left:10px;padding-left:18px}
+.tl2>div:before{left:-38px}
+.dbox{max-width:320px}
+code,pre.code{font-size:11px}
+}
+@media(max-width:899px){
+.auth{min-height:100dvh}
+.aleft{padding:calc(20px + env(safe-area-inset-top)) 20px 18px;gap:6px}
+.aleft .tcard,.aleft .tnav,.aleft .conn{display:none}
+.aright{padding:16px 14px calc(24px + env(safe-area-inset-bottom));justify-content:flex-start;margin-top:-1px}
+.acard{padding:20px 18px;border-radius:18px}
+.acard .btn{min-height:46px}
+.otop{margin-bottom:10px}
+}
+@media(max-width:380px){.kpis{gap:6px}.kp b{font-size:20px}.bnav button{font-size:10px}}
+</style></head><body>
+<div id="root"></div>
+<script>
+/* Standalone demo mode: accounts and CRM demo data are stored only in this browser. No server or database is used. */
+const LIVE=false;
+const sb=null;
+const API_BASE='';
+const AUTH_TOKEN_KEY='clientflow_auth_token';
+async function authRequest(path,body,method='POST'){const token=sessionStorage.getItem(AUTH_TOKEN_KEY);const r=await fetch(API_BASE+path,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({error:'Unexpected server response'}));if(!r.ok)throw new Error(data.error||'Request failed');return data;}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d?new Date(d).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'—';
+const dg=p=>String(p||'').replace(/\D/g,''),over=d=>d&&new Date(d)<new Date();
+const ldt=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const tmr=()=>{const d=new Date();d.setDate(d.getDate()+1);d.setHours(10,0,0,0);return ldt(d)};
+const NAMES=['New Lead','Not Contacted','Call Attempted','Connected','Interested','Highly Interested','Follow-up Required','Meeting Scheduled','Demo Scheduled','Proposal Sent','Negotiation','Won','Lost','Not Interested','Invalid Number','Wrong Number','No Response','Busy','Switched Off','Do Not Contact'];
+const OUTCOMES=['Connected','No Answer','Busy','Switched Off','Wrong Number','Interested','Not Interested','Callback Requested'];
+let me=null,statuses=[],S={tab:'dash',q:'',status:'',page:0,fu:'today',rows:[],fuRows:[]};const PAGE=20;
+const sname=l=>statuses.find(s=>s.id===l.status_id)?.name||'—';
+const sc=n=>n==='Won'?'ok':/Lost|Not Interested|Invalid|Wrong|Do Not/.test(n)?'bad':/Follow|Meeting|Demo|Proposal|Negotiation/.test(n)?'warn':/Interested|Connected/.test(n)?'blue':'';
+const rng=()=>{const s=new Date();s.setHours(0,0,0,0);const e=new Date();e.setHours(23,59,59,999);return[s,e]};
+const inTab=(f,t)=>{const[s,e]=rng(),d=new Date(f.due_at);return t==='done'?f.status==='completed':f.status==='pending'&&(t==='today'?d>=s&&d<=e:t==='upcoming'?d>e:d<new Date())};
+
+/* ---------- Demo store (only when no Supabase keys). Clearly demo data. ---------- */
+let D;try{D=JSON.parse(localStorage.getItem('telecrm_demo'))}catch(e){}
+if(!D)D={leads:[],fus:[],acts:[]};
+const save=()=>{try{localStorage.setItem('telecrm_demo',JSON.stringify(D))}catch(e){}};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const act=(lid,kind,detail)=>D.acts.push({id:uid(),lead_id:lid,kind,detail,created_at:new Date().toISOString(),profiles:{full_name:me.full_name}});
+const nxt=id=>D.fus.filter(f=>f.lead_id===id&&f.status==='pending').map(f=>f.due_at).sort()[0];
+
+/* ---------- Data layer: same calls work for Supabase and demo ---------- */
+const api={
+async leads(){
+ if(LIVE){let r=sb.from('leads').select('*',{count:'exact'}).order('created_at',{ascending:false}).range(S.page*PAGE,S.page*PAGE+PAGE-1);
+  if(S.status)r=r.eq('status_id',S.status);const q=S.q.replace(/[,()%]/g,'');
+  if(q)r=r.or(`name.ilike.%${q}%,phone.ilike.%${q}%,email.ilike.%${q}%,company.ilike.%${q}%`);
+  const{data,count,error}=await r;if(error)throw error;return{rows:data,count}}
+ const q=S.q.toLowerCase(),a=D.leads.filter(l=>(!S.status||l.status_id===S.status)&&(!q||[l.name,l.phone,l.email,l.company].join(' ').toLowerCase().includes(q))).sort((x,y)=>y.created_at.localeCompare(x.created_at));
+ return{rows:a.slice(S.page*PAGE,S.page*PAGE+PAGE).map(l=>({...l,next_followup_at:nxt(l.id)})),count:a.length}},
+async addLead(l){const row={...l,org_id:me.org_id,owner_id:me.id,created_by:me.id,status_id:statuses[0].id};
+ for(const k of['phone','email'])if(!row[k])row[k]=null;
+ if(LIVE){const{error}=await sb.from('leads').insert(row);if(error)throw new Error(error.code==='23505'?'A lead with this phone or email already exists.':error.message);return}
+ if(D.leads.some(x=>(row.phone&&x.phone===row.phone)||(row.email&&x.email&&x.email.toLowerCase()===row.email.toLowerCase())))throw new Error('A lead with this phone or email already exists.');
+ const id=uid();D.leads.push({...row,id,lead_no:1001+D.leads.length,priority:'medium',created_at:new Date().toISOString()});act(id,'lead_created',{source:row.source});save()},
+async setStatus(id,sid){if(LIVE){const{error}=await sb.from('leads').update({status_id:sid}).eq('id',id);if(error)throw error;return}
+ D.leads.find(l=>l.id===id).status_id=sid;act(id,'status_changed',{to:statuses.find(s=>s.id===sid).name});save()},
+async fus(t){
+ if(LIVE){const[s,e]=rng();let q=sb.from('follow_up_tasks').select('*, leads(name,phone)').order('due_at',{ascending:t!=='done'}).limit(200);
+  if(t==='done')q=q.eq('status','completed');else{q=q.eq('status','pending');
+   if(t==='today')q=q.gte('due_at',s.toISOString()).lte('due_at',e.toISOString());if(t==='upcoming')q=q.gt('due_at',e.toISOString());if(t==='overdue')q=q.lt('due_at',new Date().toISOString())}
+  const{data,error}=await q;if(error)throw error;return data}
+ return D.fus.filter(f=>inTab(f,t)).sort((a,b)=>a.due_at.localeCompare(b.due_at)).map(f=>({...f,leads:D.leads.find(l=>l.id===f.lead_id)}))},
+async addFu(f){if(LIVE){const{error}=await sb.from('follow_up_tasks').insert({...f,org_id:me.org_id,assignee_id:me.id,created_by:me.id});if(error)throw error;return}
+ D.fus.push({...f,id:uid(),status:'pending',assignee_id:me.id});act(f.lead_id,'followup_scheduled',{type:f.type,due_at:f.due_at});save()},
+async doneFu(id,outcome,notes){const u={status:'completed',outcome,completed_at:new Date().toISOString()};if(notes)u.notes=notes;
+ if(LIVE){const{error}=await sb.from('follow_up_tasks').update(u).eq('id',id);if(error)throw error;return}
+ const f=D.fus.find(x=>x.id===id);Object.assign(f,u);const ld=D.leads.find(l=>l.id===f.lead_id);if(ld)ld.last_contacted_at=u.completed_at;act(f.lead_id,'followup_completed',{outcome,notes});save()},
+async resched(id,iso){if(LIVE){const{error}=await sb.from('follow_up_tasks').update({due_at:iso}).eq('id',id);if(error)throw error;return}
+ const f=D.fus.find(x=>x.id===id),from=f.due_at;f.due_at=iso;act(f.lead_id,'followup_rescheduled',{from,to:iso});save()},
+async acts(id){if(LIVE){const{data,error}=await sb.from('lead_activities').select('*, profiles(full_name)').eq('lead_id',id).order('created_at',{ascending:false});if(error)throw error;return data}
+ return D.acts.filter(a=>a.lead_id===id).sort((a,b)=>b.created_at.localeCompare(a.created_at))},
+async note(id,text){if(LIVE){const{error}=await sb.from('lead_activities').insert({org_id:me.org_id,lead_id:id,user_id:me.id,kind:'note_added',detail:{text}});if(error)throw error;return}
+ act(id,'note_added',{text});save()},
+async stats(){let L,F;
+ if(LIVE){L=(await sb.from('leads').select('status_id,interest,deal_value').limit(5000)).data||[];F=(await sb.from('follow_up_tasks').select('due_at').eq('status','pending').limit(5000)).data||[]}
+ else{L=D.leads;F=D.fus.filter(f=>f.status==='pending')}
+ const n=l=>statuses.find(s=>s.id===l.status_id)?.name,c=f=>L.filter(f).length,[s,e]=rng(),by={};
+ L.forEach(l=>by[n(l)]=(by[n(l)]||0)+1);const won=c(l=>n(l)==='Won');
+ return{by,total:L.length,k:[['Total leads',L.length],['New leads',c(l=>n(l)==='New Lead')],["Today's follow-ups",F.filter(f=>new Date(f.due_at)>=s&&new Date(f.due_at)<=e).length],['Overdue',F.filter(f=>over(f.due_at)).length],
+  ['Interested',c(l=>/Interested/.test(n(l))&&!/Not/.test(n(l)))],['Hot leads',c(l=>l.interest==='hot')],['Won',won],['Lost',c(l=>n(l)==='Lost')],
+  ['Won value','₹'+L.filter(l=>n(l)==='Won').reduce((a,l)=>a+Number(l.deal_value||0),0).toLocaleString('en-IN')],['Conversion (won ÷ all leads)',(L.length?won/L.length*100:0).toFixed(1)+'%']]}}
+};
+
+/* ---------- UI helpers ---------- */
+const toast=(m)=>{const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3200)};
+const sheet=h=>{$('sheet').innerHTML='<div>'+h+'</div>';$('sheet').classList.add('on')};
+const closeSheet=()=>$('sheet').classList.remove('on');
+const run=async(fn)=>{try{await fn()}catch(e){toast(e.message||'Something went wrong.')}};
+
+/* ---------- Auth + onboarding ---------- */
+const TERMS_URL='#',PRIVACY_URL='#';
+const INDUSTRIES=['Education','Real Estate','Finance','Travel','Digital Marketing','Manufacturing','Automobiles','E-commerce','Insurance','Software and IT services','Other'],TEAMS=['3–5','6–10','11–20','20plus'];
+const TESTI=[['Neha Kulkarni','Sales Head, BrightPath Education','12 Sep 2026','We stopped losing follow-ups. Every lead has an owner and a next step now.'],
+['Rohit Mehta','Founder, Mehta Realty','28 Aug 2026','Importing our Excel sheets took minutes, and the whole team works from one list.'],
+['Farah Sheikh','Director, TripNest Travels','03 Aug 2026','Website enquiries reach the right executive straight away. Response time dropped a lot.']];
+let ti=0,uemail='',recov=false;const EMAIL=/^\S+@\S+\.\S+$/,nw=s=>s.replace(/\s/g,'').length,first=()=>(me.full_name||'there').split(' ')[0];
+const setErr=(id,t)=>{const e=$(id);if(e)e.textContent=t};
+const bad=()=>{const e=document.querySelector('small.err:not(:empty)');if(e)e.scrollIntoView({block:'center',behavior:'smooth'});msg('Please fix the fields marked in red above.')};
+const msg=(t,ok)=>{const e=$('am');if(e){e.textContent=t;e.className=ok?'okm':'err'}};
+const busy=(on,l)=>{const b=$('go');if(b){b.disabled=on;b.textContent=on?'Please wait…':l}};
+const eye=(id,b)=>{const i=$(id),h=i.type==='password';i.type=h?'text':'password';b.textContent=h?'Hide':'Show'};
+const pwF=(id,l,ac)=>`<label for="${id}">${l}</label><span class="pw"><input id="${id}" type="password" autocomplete="${ac}" placeholder="${l}"><button type="button" class="btn g" onclick="eye('${id}',this)">Show</button></span><small class="err" id="${id}_e"></small>`;
+const inF=(id,l,type,ph,ac='off')=>`<label for="${id}">${l}</label><input id="${id}" type="${type}" placeholder="${ph}" autocomplete="${ac}"><small class="err" id="${id}_e"></small>`;
+const back=`<p class="mut" style="text-align:center">Back to <a href="#" onclick="loginView();return false">Log in</a></p>`;
+const draft=(k,v)=>{try{if(v===undefined)return JSON.parse(sessionStorage.getItem('ob_'+k)||'null');sessionStorage.setItem('ob_'+k,JSON.stringify(v))}catch(e){return null}};
+
+function slideTo(i){ti=(i+TESTI.length)%TESTI.length;const t=$('tk');if(!t)return;t.style.transform=`translateX(-${ti*100}%)`;document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('on',j===ti))}
+const slide=d=>slideTo(ti+d);
+function initCar(){slideTo(ti);const c=$('tc');let x=null;c.onpointerdown=e=>{x=e.clientX};c.onpointerup=e=>{if(x!==null&&Math.abs(e.clientX-x)>40)slide(e.clientX<x?1:-1);x=null};c.onpointerleave=()=>{x=null};c.ondragstart=e=>e.preventDefault()}
+const show=(inner,top='')=>{$('root').innerHTML=`<div class="auth"><section class="aleft"><div><div class="logo">ClientFlow <b>CRM</b></div><p class="tag">Every Lead. Every Follow-up. One Place.</p></div>
+<div class="tcard" id="tc"><div class="track" id="tk">${TESTI.map(([n,r,d,t])=>`<div class="slide"><div class="row" style="justify-content:flex-start"><div class="av">${n[0]}</div><div><b>${n}</b><br><small>${r}</small></div></div><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★ <small>${d}</small></div><p>${t}</p></div>`).join('')}</div>
+<div class="tnav"><button aria-label="Previous testimonial" onclick="slide(-1)">←</button>${TESTI.map((_,i)=>`<button class="dot" aria-label="Show testimonial ${i+1}" onclick="slideTo(${i})"></button>`).join('')}<button aria-label="Next testimonial" onclick="slide(1)">→</button></div><small class="demo">Sample testimonials (demo content)</small></div>
+<div class="conn"><b>Connect Your Business</b><div class="ico"><span title="Google" aria-label="Google"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 010-9.4l-7.9-6.1a24 24 0 000 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg></span><span title="Facebook" aria-label="Facebook"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#1877F2"/><path fill="#fff" d="M33.3 30.9l1.1-6.9h-6.6v-4.5c0-1.9.9-3.7 3.9-3.7h3V10s-2.7-.5-5.4-.5c-5.5 0-9.1 3.3-9.1 9.4V24h-6.1v6.9h6.1V48a24.3 24.3 0 007.5 0V30.9h5.6z"/></svg></span><span title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#25D366"/><g transform="translate(10 10) scale(1.17)"><path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></g></svg></span></div></div></section>
+<section class="aright">${top}<div class="acard">${inner}</div></section></div>`;initCar()};
+
+function loginView(m=''){show(`<h2>Welcome Back</h2><p class="mut">Log in to manage your leads and grow your business.</p>
+<p class="note">Demo mode: create an account and sign in in this browser. Data stays on this device and is not synced to a server.</p>
+<form onsubmit="doLogin(event)" novalidate>${inF('em','Email address','email','you@company.com','username')}${pwF('pw','Password','current-password')}
+<div class="row"><span></span></div><p id="am" class="err">${esc(m)}</p><button class="btn w" id="go">Login</button></form>
+<p class="mut" style="text-align:center">New to ClientFlow CRM?</p><button class="btn g w" onclick="signupView()">Create Account</button>
+<small class="mut" style="display:block;text-align:center;margin-top:12px"><a href="${TERMS_URL}">Terms of Service</a> · <a href="${PRIVACY_URL}">Privacy Policy</a></small>`)}
+async function doLogin(e){e.preventDefault();const em=$('em').value.trim(),pw=$('pw').value;
+ setErr('em_e',EMAIL.test(em)?'':'Enter a valid email address.');setErr('pw_e',pw?'':'Enter your password.');if(!EMAIL.test(em)||!pw)return bad();
+ await demoLogin(em,pw)}
+async function google(){return msg('Google sign-in is not configured. Please use email and password.');}
+async function forgot(){const em=$('em').value.trim();setErr('em_e',EMAIL.test(em)?'':'Enter your email above first.');if(!EMAIL.test(em))return;
+ return msg('Password reset is not configured yet. Contact your administrator to reset your password.')}
+
+function signupView(){show(`<h2>Create your account</h2><p class="mut">Start managing every lead in one place.</p><form onsubmit="doSignup(event)" novalidate>${inF('fn','Full name','text','Your full name','name')}${inF('em','Work email','email','you@company.com','username')}${pwF('pw','Password (min 8 characters)','new-password')}${pwF('pw2','Confirm password','new-password')}
+<label class="chk"><input type="checkbox" id="tc2">I accept the <a href="${TERMS_URL}">Terms of Service</a> and <a href="${PRIVACY_URL}">Privacy Policy</a></label><small class="err" id="tc2_e"></small><p id="am" class="err"></p><button class="btn w" id="go">Create Account</button></form>${back}`)}
+async function doSignup(e){e.preventDefault();const fn=$('fn').value.trim(),em=$('em').value.trim(),pw=$('pw').value,ok=$('tc2').checked;
+ setErr('fn_e',fn?'':'Enter your full name.');setErr('em_e',EMAIL.test(em)?'':'Enter a valid work email.');setErr('pw_e',pw.length>=8?'':'Use at least 8 characters.');setErr('pw2_e',pw===$('pw2').value?'':'Passwords do not match.');setErr('tc2_e',ok?'':'Accept the terms to continue.');
+ if(!fn||!EMAIL.test(em)||pw.length<8||pw!==$('pw2').value||!ok)return bad();
+ await demoSignup(fn,em,pw)}
+
+function demoView(){show(`<h2>Request a demo</h2><p class="mut">Tell us how to reach you and we will get in touch.</p><form onsubmit="doDemo(event)" novalidate>${inF('dn','Your name','text','Full name')}${inF('em','Work email','email','you@company.com')}${inF('dp','Phone number','tel','10-digit mobile number')}${inF('dc','Company name','text','Company')}<p id="am" class="err"></p><button class="btn w" id="go">Send request</button></form>${back}`)}
+async function doDemo(e){e.preventDefault();const[n,em,ph,co]=['dn','em','dp','dc'].map(i=>$(i).value.trim()),okP=/^[6-9]\d{9}$/.test(ph.replace(/^\+?91/,''));
+ setErr('dn_e',n?'':'Enter your name.');setErr('em_e',EMAIL.test(em)?'':'Enter a valid email.');setErr('dp_e',okP?'':'Enter a valid 10-digit Indian mobile number.');setErr('dc_e',co?'':'Enter your company name.');
+ if(!n||!EMAIL.test(em)||!okP||!co)return bad();if(!LIVE)return msg('Demo requests are not configured yet. Add your Supabase keys to this file.');
+ busy(true,'Send request');const{error}=await sb.from('demo_requests').insert({name:n,email:em,phone:ph,company:co});busy(false,'Send request');
+ if(error)return msg('Could not send your request. Please try again.');msg('Request received. Our team will contact you soon.',1);e.target.reset()}
+
+function recoveryView(){recov=true;show(`<h2>Set a new password</h2><form onsubmit="doRec(event)" novalidate>${pwF('pw','New password','new-password')}${pwF('pw2','Confirm password','new-password')}<p id="am" class="err"></p><button class="btn w" id="go">Update password</button></form>`)}
+async function doRec(e){e.preventDefault();const p=$('pw').value;if(p.length<8)return setErr('pw_e','Use at least 8 characters.');if(p!==$('pw2').value)return setErr('pw2_e','Passwords do not match.');
+ busy(true,'Update password');const r=await sb.auth.updateUser({password:p});busy(false,'Update password');if(r.error)return msg(r.error.message);recov=false;boot()}
+
+const obTop=n=>`<div class="otop"><span class="steps" role="img" aria-label="Step ${n} of 2"><i class="on"></i><i class="${n>1?'on':''}"></i></span><span class="mut">${esc(uemail)} <button class="btn g" onclick="logout()">Logout</button></span></div>`;
+const drB=()=>draft('b',{phone:$('ph').value,industry:$('ind').value,team_size:$('tm').value});
+function onb1(){const d=draft('b')||{},v=k=>d[k]??(k==='phone'?(me.phone||'').replace(/^\+91/,''):me[k])??'';
+ show(`<h2>Hi ${esc(first())}, Welcome to ClientFlow CRM</h2><p class="mut">Please tell us more about you, so we can help better.</p><form onsubmit="saveB(event)" novalidate>
+ <label for="ph">Phone number</label><span class="pw"><span class="cc">+91</span><input id="ph" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" value="${esc(v('phone'))}" oninput="drB()"></span><small class="err" id="ph_e"></small>
+ <label for="ind">Industry</label><select id="ind" onchange="drB()"><option value="">Select industry</option>${INDUSTRIES.map(o=>`<option ${v('industry')===o?'selected':''}>${o}</option>`).join('')}</select><small class="err" id="ind_e"></small>
+ <label for="tm">Sales team size</label><select id="tm" onchange="drB()"><option value="">Select team size</option>${TEAMS.map(o=>`<option ${v('team_size')===o?'selected':''}>${o}</option>`).join('')}</select><small class="err" id="tm_e"></small>
+ <p id="am" class="err"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="go">Next</button></div></form>`,obTop(1))}
+async function saveB(e){e.preventDefault();const ph=$('ph').value.trim(),ind=$('ind').value,tm=$('tm').value,okP=/^[6-9]\d{9}$/.test(ph);
+ setErr('ph_e',okP?'':'Enter a valid 10-digit Indian mobile number.');setErr('ind_e',ind?'':'Select your industry.');setErr('tm_e',tm?'':'Select your team size.');if(!okP||!ind||!tm)return bad();
+ busy(true,'Next');const{error}=LIVE?await sb.rpc('save_business_info',{p_phone:'+91'+ph,p_industry:ind,p_team:tm}):demoSave({phone:'+91'+ph,industry:ind,team_size:tm,onboarding_step:Math.max(1,me.onboarding_step||0)});
+ if(error){busy(false,'Next');return msg('Could not save. '+error.message)}
+ Object.assign(me,{phone:'+91'+ph,industry:ind,team_size:tm,onboarding_step:Math.max(1,me.onboarding_step||0)});draft('b',null);onb2()}
+function onb2(){const d=draft('r')||{},a=d.a??me.current_tool??'',b=d.b??me.crm_reason??'';
+ show(`<h2>Hi ${esc(first())}, Welcome to ClientFlow CRM</h2><p class="mut">Please tell us more about you, so we can help better.</p><form onsubmit="saveR(event)" novalidate>
+ <label for="qa">What are you using right now to manage your leads and follow-ups?</label><textarea id="qa" rows="4" oninput="chkR()">${esc(a)}</textarea><div class="row"><small class="err" id="qa_e"></small><small class="mut" id="qa_c"></small></div>
+ <label for="qb">Why do you need a CRM?</label><textarea id="qb" rows="4" oninput="chkR()">${esc(b)}</textarea><div class="row"><small class="err" id="qb_e"></small><small class="mut" id="qb_c"></small></div>
+ <p id="am" class="err"></p><div class="row"><button type="button" class="btn g" onclick="onb1()">Back</button><button class="btn" id="go" disabled>Next</button></div></form>`,obTop(2));chkR()}
+function chkR(){const a=$('qa').value,b=$('qb').value;draft('r',{a,b});let ok=true;[['qa',a],['qb',b]].forEach(([i,t])=>{const n=nw(t);$(i+'_c').textContent=n+' / 10 minimum';setErr(i+'_e',n&&n<10?'Write at least 10 characters.':'');if(n<10)ok=false});$('go').disabled=!ok}
+async function saveR(e){e.preventDefault();const a=$('qa').value.trim(),b=$('qb').value.trim();if(nw(a)<10||nw(b)<10)return;
+ busy(true,'Next');const{error}=LIVE?await sb.rpc('save_crm_requirements',{p_tool:a,p_reason:b}):demoSave({current_tool:a,crm_reason:b,onboarding_step:2,onboarding_done:true});if(error){busy(false,'Next');return msg('Could not save. '+error.message)}
+ me.onboarding_done=true;draft('r',null);enter()}
+
+/* ---------- Demo accounts: used only when Supabase keys are empty. Browser-only, NOT real security. ---------- */
+const st=w=>{try{const x=window[w];x.setItem('_t','1');x.removeItem('_t');return x}catch(e){return null}};
+const LS=st('localStorage'),SS=st('sessionStorage'),mem={},kv=(S,m)=>({get:k=>S?S.getItem(k):(m[k]??null),set:(k,v)=>{S?S.setItem(k,v):(m[k]=v)},del:k=>{S?S.removeItem(k):delete m[k]}});
+const L=kv(LS,{}),Z=kv(SS,{});
+const DK='lf_demo_accounts',DS='lf_demo_session';
+const dAcc=()=>{try{return JSON.parse(L.get(DK)||'{}')}catch(e){return{}}};
+const dPut=a=>{try{L.set(DK,JSON.stringify(a))}catch(e){}};
+async function hashPw(pw,salt){if(!(window.crypto&&crypto.subtle))return btoa(unescape(encodeURIComponent(salt+pw)));
+ const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);
+ return [...new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:100000,hash:'SHA-256'},k,256))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function demoSignup(fn,em,pw){const a=dAcc(),k=em.toLowerCase();if(a[k])return msg('An account with this email already exists. Log in instead.');
+ const salt=Math.random().toString(36).slice(2);a[k]={full_name:fn,salt,hash:await hashPw(pw,salt),onboarding_step:0,onboarding_done:false};dPut(a);Z.set(DS,k);demoBoot()}
+async function demoLogin(em,pw){const k=em.toLowerCase(),u=dAcc()[k];busy(true,'Login');const ok=!!u&&await hashPw(pw,u.salt)===u.hash;busy(false,'Login');
+ if(!ok)return msg('Incorrect email or password.');Z.set(DS,k);demoBoot()}
+function demoBoot(){const k=Z.get(DS),u=k&&dAcc()[k];if(!u)return loginView();uemail=k;me={...u,id:'me',org_id:'demo',role:'admin'};
+ if(!me.onboarding_done)return me.onboarding_step>=1?onb2():onb1();enter()}
+function demoSave(o){const a=dAcc(),k=Z.get(DS);Object.assign(a[k],o);dPut(a);return{}}
+async function enter(){statuses=LIVE?(await sb.from('lead_statuses').select('*').order('sort')).data||[]:NAMES.map((n,i)=>({id:'s'+i,name:n,sort:i}));start()}
+async function mysqlBoot(){try{const r=await authRequest('/api/auth/me',null,'GET');uemail=r.user.email;me={...r.user,org_id:'mysql-'+r.user.id,role:'admin',onboarding_done:true};enter()}catch(err){sessionStorage.removeItem(AUTH_TOKEN_KEY);return loginView()}}
+async function boot(){if(recov)return;return demoBoot()}
+function logout(){Z.del(DS);sessionStorage.removeItem(AUTH_TOKEN_KEY);me=null;uemail='';loginView()}
+window.addEventListener('unhandledrejection',e=>msg('Something went wrong: '+((e.reason&&e.reason.message)||e.reason)));
+
+/* ================= ClientFlow app (after login) ================= */
+const SEEDT=[],SEEDF=()=>[];
+if(D.v!==4){D.leads=[];D.acts=[];D.alog=[];D.alerts=[];D.team=SEEDT;D.set={};D.fus=SEEDF();D.v=4;save()}
+D.team=D.team||SEEDT;D.alog=D.alog||[];D.alerts=D.alerts||[];
+const SET=D.set=Object.assign({sources:['Website','Meta Ads','Google Ads','Referral','Social Media','Manual entry','Excel import','Cold call'],rr:true,rrIdx:0,def:'me',rules:{},remind:true,remMin:30,utm:{utm_source:1,utm_medium:1,utm_campaign:1,utm_content:0,utm_term:0},wa:'Hi {name}, thanks for your interest. When is a good time to talk?',wab:1,call:1,reqAdmin:1,inactive:{}},D.set||{});
+const INTR=['Ready to Start','Interested','Follow-Up Required'];{const m={hot:'Ready to Start',warm:'Interested',cold:'Follow-Up Required'};D.leads.forEach(l=>{if(m[l.interest])l.interest=m[l.interest]});save()}
+const TY={call:'#0E9F8E',whatsapp:'#16A34A',email:'#5038A5',meeting:'#2563EB',demo:'#7C3AED',other:'#F59E0B'};
+const team=()=>[{id:me.id,name:me.full_name||'You',email:uemail,role:me.role||'admin',title:'Admin',target:150000,login:new Date().toISOString()},...(LIVE?[...(window.LT||[]),...D.team.filter(t=>t.custom)]:D.team)].filter(t=>!(SET.removed||[]).includes(t.id));
+const pool=()=>team().filter(t=>t.role!=='viewer'&&!SET.inactive[t.id]);
+const tn=id=>team().find(t=>t.id===(id||me.id))?.name||'—',own=l=>tn(l.owner_id);
+const vis=l=>me.role!=='sales'||(l.owner_id||me.id)===me.id;
+const canEdit=()=>me.role!=='viewer',canExp=()=>canEdit()&&(!SET.reqAdmin||['admin','manager'].includes(me.role));
+const isWon=l=>sname(l)==='Won',isLost=l=>sname(l)==='Lost',money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+const pct=(a,b)=>b?(a/b*100).toFixed(1)+'%':'0%';
+const wa=l=>{let d=dg(l.phone);if(d.length===10)d='91'+d;return`https://wa.me/${d}?text=${encodeURIComponent(SET.wa.replace('{name}',l.name))}`};
+const M=h=>$('main').innerHTML=h,opt=(a,s,all)=>(all?`<option value="">${all}</option>`:'')+a.map(x=>{const v=Array.isArray(x)?x[0]:x,t=Array.isArray(x)?x[1]:x;return`<option value="${esc(v)}" ${v===s?'selected':''}>${esc(t)}</option>`}).join('');
+const kpi=(l,v,c='')=>`<div class="card kp ${c}"><small>${l}</small><b>${v}</b></div>`;
+const bars=o=>{const mx=Math.max(1,...Object.values(o));return Object.entries(o).map(([n,c])=>`<div class="br"><span>${esc(n)}</span><div><i style="width:${c/mx*100}%"></i></div><b>${c}</b></div>`).join('')||'<p class="mut">No data yet.</p>'};
+const cnt=(L,f)=>{const o={};L.forEach(l=>{const k=f(l)||'Unknown';o[k]=(o[k]||0)+1});return o};
+const sw=(on,fn)=>`<label class="sw"><input type="checkbox" ${on?'checked':''} onchange="${fn}"><i></i></label>`;
+const dl=(rows,name)=>{const c=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+c],{type:'text/csv'}));a.download=name;a.click();toast('Exported '+(rows.length-1)+' rows.')};
+const ownerStats=L=>team().map(t=>{const m=L.filter(l=>(l.owner_id||me.id)===t.id),w=m.filter(isWon);return{t,n:m.length,c:m.filter(l=>!/^(New Lead|Not Contacted)$/.test(sname(l))).length,w:w.length,lo:m.filter(isLost).length,rev:w.reduce((a,l)=>a+Number(l.deal_value||0),0),cv:m.length?w.length/m.length*100:0}});
+const chip=(on,fn,l)=>`<button class="btn g ${on?'on':''}" onclick="${fn}">${l}</button>`;
+const head=(t,x='')=>`<div class="ph"><h2>${t}</h2><div class="acts">${x}</div></div>`;
+const dday=d=>new Date(d).toDateString();
+
+/* --- pick owner: one assignment service for form, import and manual leads --- */
+function pickOwner(src){const p=pool();let t;
+ if(SET.rules[src]&&p.some(x=>x.id===SET.rules[src]))t=SET.rules[src];
+ else if(!p.length){D.alerts.unshift({at:new Date().toISOString(),msg:'No active team member available for "'+src+'". Lead kept with default owner.'});t=me.id}
+ else if(SET.rr){t=p[SET.rrIdx%p.length].id;SET.rrIdx++}
+ else t=p.some(x=>x.id===SET.def)?SET.def:(SET.def==='me'?me.id:p[0].id);
+ save();return t}
+const logAct=async(id,k,d={})=>{try{if(LIVE)await sb.from('lead_activities').insert({org_id:me.org_id,lead_id:id,user_id:me.id,kind:k,detail:d});else{act(id,k,d);save()}}catch(e){}};
+Object.assign(api,{
+ async all(){if(LIVE){const{data,error}=await sb.from('leads').select('*').order('created_at',{ascending:false}).limit(5000);if(error)throw error;return data}return D.leads.map(l=>({...l,next_followup_at:nxt(l.id)}))},
+ async allFus(){if(LIVE){const{data,error}=await sb.from('follow_up_tasks').select('*, leads(name,phone,owner_id)').order('due_at').limit(2000);if(error)throw error;return data}return D.fus.map(f=>({...f,leads:D.leads.find(l=>l.id===f.lead_id)}))},
+ async allActs(){if(LIVE){const{data,error}=await sb.from('lead_activities').select('*, profiles(full_name), leads(name)').order('created_at',{ascending:false}).limit(500);if(error)throw error;return data}return D.acts.map(a=>({...a,leads:D.leads.find(l=>l.id===a.lead_id)})).sort((a,b)=>b.created_at.localeCompare(a.created_at))},
+ async updLead(id,p){if(LIVE){const{error}=await sb.from('leads').update(p).eq('id',id);if(error)throw error}else Object.assign(D.leads.find(l=>l.id===id),p);await logAct(id,'field_edited',{fields:Object.keys(p).join(', ')});save()},
+ async delLead(id){if(LIVE){const{error}=await sb.from('leads').delete().eq('id',id);if(error)throw error}else{D.leads=D.leads.filter(l=>l.id!==id);D.fus=D.fus.filter(f=>f.lead_id!==id);D.acts=D.acts.filter(a=>a.lead_id!==id);save()}},
+ async assign(ids,o,how='manual'){for(const id of ids){if(LIVE){if(!/^[0-9a-f-]{36}$/.test(o))throw new Error('Pick a registered team member.');await sb.from('leads').update({owner_id:o}).eq('id',id)}else D.leads.find(l=>l.id===id).owner_id=o;await logAct(id,'owner_changed',{to:tn(o)});const l=S.all.find(x=>x.id===id);D.alog.unshift({lead:l?l.name:id,to:tn(o),how,at:new Date().toISOString()})}D.alog.length=Math.min(D.alog.length,200);save()},
+ async addLead(l){const{utm,owner_id,...r}=l,o=owner_id||pickOwner(r.source),row={...r,org_id:me.org_id,owner_id:LIVE&&!/^[0-9a-f-]{36}$/.test(o)?me.id:o,created_by:me.id,status_id:statuses[0].id};
+ for(const k of['phone','email'])if(!row[k])row[k]=null;let id;
+ if(LIVE){const{data,error}=await sb.from('leads').insert(row).select('id').single();if(error)throw new Error(error.code==='23505'?'A lead with this phone or email already exists.':error.message);id=data.id;await logAct(id,'lead_created',{source:row.source,utm})}
+ else{if(D.leads.some(x=>(row.phone&&x.phone===row.phone)||(row.email&&x.email&&x.email.toLowerCase()===row.email.toLowerCase())))throw new Error('A lead with this phone or email already exists.');id=uid();D.leads.push({...row,id,utm,lead_no:1001+D.leads.length,interest:row.interest||'Interested',priority:'medium',created_at:new Date().toISOString()});act(id,'lead_created',{source:row.source,utm});save()}
+ D.alog.unshift({lead:row.name,to:tn(o),how:SET.rules[r.source]?'rule':SET.rr?'round-robin':'default',at:new Date().toISOString()});save();return id}});
+{const _s=api.setStatus;api.setStatus=async(id,sid)=>{await _s(id,sid);if(!LIVE&&statuses.find(s=>s.id===sid).name==='Won'){D.leads.find(l=>l.id===id).won_at=new Date().toISOString();save()}}}
+async function enter(){statuses=LIVE?(await sb.from('lead_statuses').select('*').order('sort')).data||[]:NAMES.map((n,i)=>({id:'s'+i,name:n,sort:i}));
+ if(LIVE){const r=await sb.from('profiles').select('id,full_name,role').neq('id',me.id);window.LT=(r.data||[]).map(p=>({id:p.id,name:p.full_name,role:p.role||'sales',email:'',target:100000}))}start()}
+
+function ask(msg,fn){let d=$('dlg');if(!d){d=document.createElement('div');d.id='dlg';document.body.appendChild(d)}d.innerHTML='<div class="dbox"><p>'+esc(msg)+'</p><div class="acts"><button class="btn" id="dy">Yes</button><button class="btn g" id="dn">No</button></div></div>';d.className='on';$('dy').onclick=()=>{d.className='';fn()};$('dn').onclick=()=>{d.className=''}}
+const mng=()=>['admin','manager'].includes(me.role);
+function addMember(){const n=$('bn').value.trim(),d=$('bd').value.trim();if(!n)return toast('Enter the member name.');if(team().some(t=>t.name.toLowerCase()===n.toLowerCase()))return toast('That member already exists.');D.team.push({id:'t'+uid(),name:n,title:d,email:'',role:'sales',target:100000,login:null,custom:true});save();toast(n+' added.');vBoard()}
+function rmMember(id){const t=team().find(x=>x.id===id);ask('Remove '+t.name+' from the team?',()=>run(async()=>{S.all=await api.all();const ids=S.all.filter(l=>l.owner_id===id).map(l=>l.id);if(ids.length)await api.assign(ids,me.id,'member removed');D.fus.forEach(f=>{if(f.owner_id===id)f.owner_id=me.id});D.team=D.team.filter(x=>x.id!==id);SET.removed=[...(SET.removed||[]),id];delete SET.inactive[id];Object.keys(SET.rules).forEach(k=>{if(SET.rules[k]===id)delete SET.rules[k]});if(SET.def===id)SET.def='me';save();toast(t.name+' removed. Their leads moved to you.');vBoard()}))}
+/* --- shell --- */
+const PAGES=[['WORKSPACE',[['dash','Dashboard','▦'],['leads','Leads','👥'],['fus','Follow-ups','⏰'],['reports','Reports','📈']]],['TEAM & AUTOMATION',[['board','Team Leaderboard','🏆'],['assign','Lead Assignment','🔀'],['web','Website Enquiries','🌐'],['tl','Activity Timeline','🕘']]],['ADMINISTRATION',[['imp','Import / Export','⬆️'],['team','Team Members','🧑‍🤝‍🧑'],['set','Settings','⚙️']]]];
+const ACC={admin:null,manager:['team','set'],sales:['assign','web','team','set','imp','board'],viewer:['assign','web','team','set','imp']};
+const V={dash:vDash,leads:vLeads,fus:vFus,reports:vRep,board:vBoard,assign:vAssign,web:vWeb,tl:vTl,imp:vImp,team:vTeam,set:vSet};
+function start(){const hide=ACC[me.role]||[];
+ $('root').innerHTML=`<aside class="side" id="side"><div class="lg"><i>≋</i><div><b>ClientFlow CRM</b><small>Sales & Lead Management</small></div></div>${PAGES.map(([g,a])=>`<h6>${g}</h6>${a.filter(x=>!hide.includes(x[0])).map(([k,l,i])=>`<button data-t="${k}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join('')}`).join('')}<div class="sfoot"><small>${esc(me.full_name||'')} · ${esc(me.role||'')}</small><button onclick="ask('Do you want to log out?',logout)">⎋ Log out</button></div></aside>
+ <div class="shell"><header><button class="btn g" id="mb" onclick="$('side').classList.toggle('open')">☰</button><h1><span class="dt">ClientFlow CRM </span><span class="mt" id="pt">ClientFlow</span></h1><span class="mut">${esc(me.full_name||'')}</span><button class="btn g" onclick="ask('Do you want to log out?',logout)">Log out</button></header><main id="main"></main></div>
+ <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"></div><div id="toast" role="status"></div><nav class="bnav" id="bnav">${['dash','leads','fus','reports','tl'].filter(k=>!hide.includes(k)).slice(0,4).map(k=>{const p=PAGES.flatMap(g=>g[1]).find(x=>x[0]===k);return `<button data-t="${k}" onclick="go('${k}')"><span>${p[2]}</span>${p[1]}</button>`}).join('')}<button id="bmore" onclick="$('side').classList.toggle('open')"><span>☰</span>More</button></nav>`;go(S.tab in V&&!hide.includes(S.tab)?S.tab:'dash');
+ if(!window.remT)window.remT=setInterval(remind,6e4)}
+function go(t,a){S.tab=t;$('side').classList.remove('open');document.querySelectorAll('.side button[data-t],.bnav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));const bm=$('bmore');if(bm)bm.classList.toggle('on',!document.querySelector('.bnav button[data-t="'+t+'"]'));const pt=$('pt'),pg=PAGES.flatMap(g=>g[1]).find(x=>x[0]===t);if(pt&&pg)pt.textContent=pg[1];window.scrollTo(0,0);run(()=>V[t](a))}
+document.addEventListener('click',e=>{const sd=document.getElementById('side');if(sd&&sd.classList.contains('open')&&!sd.contains(e.target)&&!e.target.closest('#bmore,#mb'))sd.classList.remove('open')});
+const notified=new Set();
+async function remind(){if(!SET.remind||!me)return;try{(await api.allFus()).filter(f=>f.status==='pending'&&!notified.has(f.id)).forEach(f=>{const m=(new Date(f.due_at)-Date.now())/6e4;if(m<=SET.remMin){notified.add(f.id);toast('⏰ Follow-up due: '+(f.leads?.name||f.title||'lead')+' ('+f.type+')');try{window.Notification&&Notification.permission==='granted'&&new Notification('Follow-up due',{body:f.leads?.name})}catch(e){}}})}catch(e){}}
+
+/* --- Dashboard --- */
+async function vDash(){M('<p class="mut">Loading…</p>');const L=(await api.all()).filter(vis),F=(await api.allFus()).filter(f=>f.status==='pending'),A=(await api.allActs()).slice(0,7),[s,e]=rng(),W=L.filter(isWon),
+ tod=F.filter(f=>{const d=new Date(f.due_at);return d>=s&&d<=e}),od=F.filter(f=>over(f.due_at));
+ M(`${head('Dashboard',`<button class="btn" onclick="newLead()">+ Add lead</button>`)}${L.length?'':'<div class="card"><b>Welcome 👋</b><p class="mut">No leads yet. Add your first lead or import an Excel sheet to get started.</p><button class="btn" onclick="newLead()">+ Add lead</button> <button class="btn g" onclick="go(\'imp\')">Import Excel</button></div>'}<div class="kpis">${kpi('Total leads',L.length)}${kpi('New leads',L.filter(l=>sname(l)==='New Lead').length)}${kpi('Ready to Start',L.filter(l=>l.interest==='Ready to Start').length)}${kpi('Overdue follow-ups',od.length,'er')}${kpi('Won deals',W.length,'ok')}${kpi('Conversion',pct(W.length,L.length))}${kpi('Won value',money(W.reduce((a,l)=>a+Number(l.deal_value||0),0)),'ok')}</div>
+ <div class="grid"><div class="card"><h3>Leads by status</h3>${bars(cnt(L,sname))}</div><div class="card"><h3>Leads by source</h3>${bars(cnt(L,l=>l.source))}</div>
+ <div class="card"><h3>🏆 Sales leaderboard</h3>${ownerStats(L).sort((a,b)=>b.w-a.w).map(o=>`<div class="br"><span>${esc(o.t.name)}</span><div><i style="width:${o.w/Math.max(1,W.length)*100}%"></i></div><b>${o.w}</b></div>`).join('')}</div></div>
+ <div class="grid"><div class="card"><h3>Today's tasks (${tod.length})</h3>${tod.map(f=>`<div class="row2"><span><b>${esc(f.leads?.name||f.title||'Team task')}</b><br><small>${fmt(f.due_at)} · ${esc(f.type)}</small></span>${f.lead_id?`<button class="btn g" onclick="openLead('${f.lead_id}')">Open</button>`:''}</div>`).join('')||'<p class="mut">Nothing due today 🎉</p>'}</div>
+ <div class="card"><h3>Recent activity</h3>${A.map(a=>`<div class="row2"><span>${esc(label(a))}<br><small>${esc(a.leads?.name||'')} · ${esc(a.profiles?.full_name||'System')} · ${fmt(a.created_at)}</small></span></div>`).join('')||'<p class="mut">No activity yet.</p>'}</div></div>`)}
+
+/* --- Leads --- */
+const Q={q:'',status:'',source:'',owner:'',temp:'',from:'',to:'',page:0,sel:new Set()},LP=15;
+const fl=()=>{const q=Q.q.toLowerCase();return S.all.filter(l=>(!q||[l.name,l.phone,l.email,l.company].join(' ').toLowerCase().includes(q))&&(!Q.status||l.status_id===Q.status)&&(!Q.source||l.source===Q.source)&&(!Q.owner||(l.owner_id||me.id)===Q.owner)&&(!Q.temp||l.interest===Q.temp)&&(!Q.from||l.created_at.slice(0,10)>=Q.from)&&(!Q.to||l.created_at.slice(0,10)<=Q.to))};
+async function vLeads(){S.all=(await api.all()).filter(vis);const f=(k,v)=>`oninput="Q.${k}=this.value;Q.page=0;drawLeads()"`,fc=k=>`onchange="Q.${k}=this.value;Q.page=0;drawLeads()"`;
+ M(`${head('Leads <small class="badge">'+S.all.length+'</small>',`${canEdit()?'<button class="btn" onclick="newLead()">+ Add Lead</button><button class="btn g" onclick="go(\'imp\')">Import Excel</button>':''}${canExp()?'<button class="btn g" onclick="expLeads()">Export Excel</button>':''}`)}
+ <div class="flt"><input type="search" placeholder="Search name, phone, email, company" value="${esc(Q.q)}" ${f('q')}><select ${fc('status')}>${opt(statuses.map(s=>[s.id,s.name]),Q.status,'All statuses')}</select><select ${fc('source')}>${opt(SET.sources,Q.source,'All sources')}</select><select ${fc('owner')}>${opt(team().map(t=>[t.id,t.name]),Q.owner,'All owners')}</select><select ${fc('temp')}>${opt(INTR,Q.temp,'Any interest')}</select><input type="date" title="From" value="${Q.from}" ${fc('from')}><input type="date" title="To" value="${Q.to}" ${fc('to')}></div><div id="bulk"></div><div class="tw"><table class="tbl"><thead><tr><th><input type="checkbox" id="sa" onchange="selPage(this.checked)"></th><th>Lead</th><th>Contact</th><th>Status</th><th>Source</th><th>Owner</th><th>Interest</th><th>Next follow-up</th><th>Actions</th></tr></thead><tbody id="lb"></tbody></table></div><div class="row" id="pg" style="margin-top:10px"></div>`);drawLeads()}
+function drawLeads(){const a=fl(),pages=Math.max(1,Math.ceil(a.length/LP));Q.page=Math.min(Q.page,pages-1);const r=a.slice(Q.page*LP,Q.page*LP+LP),ed=canEdit();
+ $('lb').innerHTML=r.map(l=>`<tr><td><input type="checkbox" ${Q.sel.has(l.id)?'checked':''} onchange="tgl('${l.id}',this.checked)" ${ed?'':'disabled'}></td><td><b>${esc(l.name)}</b><br><small>L-${l.lead_no} · ${esc(l.company||'')}</small></td><td><small>${esc(l.phone||'')}<br>${esc(l.email||'')}</small></td><td><span class="badge ${sc(sname(l))}">${esc(sname(l))}</span></td><td>${esc(l.source||'—')}</td><td>${esc(own(l))}</td><td>${l.interest?`<span class="badge ${l.interest==='Ready to Start'?'ok':l.interest==='Follow-Up Required'?'warn':'blue'}">${esc(l.interest)}</span>`:''}</td><td><small class="${over(l.next_followup_at)?'over':''}">${fmt(l.next_followup_at)}</small></td>
+ <td style="white-space:nowrap">${l.phone?`<a class="ia" title="Call" href="tel:${esc(l.phone)}" onclick="logAct('${l.id}','call_made',{})">📞</a><a class="ia" title="WhatsApp" target="_blank" rel="noopener" href="${wa(l)}" onclick="logAct('${l.id}','wa_sent',{})">💬</a>`:''}<button class="ia" title="Open" onclick="openLead('${l.id}')">👁</button><button class="ia" title="History" onclick="go('tl','${l.id}')">🕘</button>${ed?`<button class="ia" title="Edit" onclick="newLead('${l.id}')">✏️</button><button class="ia" title="Delete" onclick="delL('${l.id}')">🗑</button>`:''}</td></tr>`).join('')||'<tr><td colspan="9" class="mut">No leads match. Adjust filters or add a lead.</td></tr>';
+ $('pg').innerHTML=`<button class="btn g" ${Q.page?'':'disabled'} onclick="Q.page--;drawLeads()">Previous</button><small>Page ${Q.page+1} of ${pages} · ${a.length} leads</small><button class="btn g" ${Q.page+1>=pages?'disabled':''} onclick="Q.page++;drawLeads()">Next</button>`;
+ $('sa').checked=r.length&&r.every(l=>Q.sel.has(l.id));bulkBar()}
+function tgl(id,c){c?Q.sel.add(id):Q.sel.delete(id);bulkBar()}
+function selPage(c){fl().slice(Q.page*LP,Q.page*LP+LP).forEach(l=>c?Q.sel.add(l.id):Q.sel.delete(l.id));drawLeads()}
+function bulkBar(){$('bulk').innerHTML=Q.sel.size?`<div class="bulk"><b>${Q.sel.size} selected</b><button class="btn" onclick="bulkAssign()">Assign Owner</button><button class="btn g" onclick="Q.sel=new Set(fl().map(l=>l.id));drawLeads()">Select all ${fl().length} filtered</button><button class="btn g" onclick="Q.sel.clear();drawLeads()">Clear</button></div>`:''}
+function bulkAssign(){sheet(`<h3>Assign owner</h3><select id="bo">${opt(pool().map(t=>[t.id,t.name]))}</select><p class="note"><b>${Q.sel.size}</b> lead(s) will be reassigned. This is recorded in each lead's history.</p><button class="btn w" onclick="doBulk()">Confirm assignment</button><p class="mut" style="text-align:center" onclick="closeSheet()">Cancel</p>`)}
+function doBulk(){run(async()=>{await api.assign([...Q.sel],$('bo').value,'bulk');toast(Q.sel.size+' leads assigned.');Q.sel.clear();closeSheet();vLeads()})}
+function delL(id){if(confirm('Delete this lead and its history? This cannot be undone.'))run(async()=>{await api.delLead(id);Q.sel.delete(id);toast('Lead deleted.');vLeads()})}
+function expLeads(){const a=fl();dl([['Lead no','Name','Phone','Email','Company','Status','Source','Owner','Interest','Deal value','Created'],...a.map(l=>[l.lead_no,l.name,l.phone,l.email,l.company,sname(l),l.source,own(l),l.interest,l.deal_value,l.created_at])],'leads-export.csv')}
+function newLead(id){const l=id?S.all.find(x=>x.id===id):{};sheet(`<h3>${id?'Edit':'Add'} lead</h3><input id="nn" placeholder="Name *" value="${esc(l.name)}"><input id="np" type="tel" placeholder="Phone (10 digits)" value="${esc(l.phone)}"><input id="ne" type="email" placeholder="Email" value="${esc(l.email)}"><input id="nc" placeholder="Company" value="${esc(l.company)}"><select id="ns">${opt(SET.sources,l.source||'Manual entry')}</select><select id="ni">${opt(INTR,l.interest||'Interested')}</select><input id="nv" type="number" placeholder="Deal value (₹)" value="${esc(l.deal_value||'')}">${id?'':`<select id="no">${opt(pool().map(t=>[t.id,t.name]),'','Auto-assign (rules / round-robin)')}</select>`}
+ <button class="btn w" onclick="saveLead('${id||''}')">Save lead</button><p class="mut" style="text-align:center" onclick="closeSheet()">Cancel</p>`)}
+function saveLead(id){run(async()=>{const name=$('nn').value.trim(),ph=$('np').value.trim();if(!name)throw new Error('Name is required.');if(ph&&!/^\+?\d[\d\s-]{8,14}$/.test(ph))throw new Error('Enter a valid phone number.');
+ const d={name,phone:ph,email:$('ne').value.trim(),company:$('nc').value.trim(),source:$('ns').value,interest:$('ni').value,deal_value:$('nv').value?Number($('nv').value):null};
+ if(id){for(const k of['phone','email'])if(!d[k])d[k]=null;await api.updLead(id,d)}else{d.owner_id=$('no').value||undefined;await api.addLead(d)}closeSheet();toast('Lead saved.');go(S.tab)})}
+const label=a=>({lead_created:'Lead created'+(a.detail?.source?' from '+a.detail.source:''),status_changed:'Stage → '+a.detail?.to,owner_changed:'Owner → '+a.detail?.to,interest_changed:'Interest → '+a.detail?.to,followup_scheduled:`Follow-up (${a.detail?.type}) scheduled for ${fmt(a.detail?.due_at)}`,followup_completed:'Follow-up completed: '+(a.detail?.outcome||''),followup_rescheduled:'Follow-up rescheduled to '+fmt(a.detail?.to),note_added:'Note: '+a.detail?.text,call_made:'Call placed',wa_sent:'WhatsApp opened',field_edited:'Edited fields: '+a.detail?.fields,imported:'Imported from Excel/CSV'})[a.kind]||a.kind;
+const ICO={lead_created:'✨',status_changed:'🔄',owner_changed:'👤',followup_scheduled:'⏰',followup_completed:'✅',followup_rescheduled:'📅',note_added:'📝',call_made:'📞',wa_sent:'💬',field_edited:'✏️',imported:'⬆️'};
+async function openLead(id){if(!S.all)S.all=await api.all();const l=S.all.find(x=>x.id===id);if(!l)return;const ed=canEdit();
+ sheet(`<div class="row"><h3 style="margin:0">${esc(l.name)}</h3><button class="btn g" onclick="closeSheet()">Close</button></div><p class="mut">${esc([l.phone,l.email,l.company].filter(Boolean).join(' · ')||'No contact details')}<br>Owner: ${esc(own(l))} · Source: ${esc(l.source||'—')}</p>
+ <div class="acts" style="margin-bottom:10px">${l.phone?`<a class="btn g" href="tel:${esc(l.phone)}" onclick="logAct('${id}','call_made',{})">📞 Call</a><a class="btn g" target="_blank" rel="noopener" href="${wa(l)}" onclick="logAct('${id}','wa_sent',{})">💬 WhatsApp</a>`:''}${l.email?`<a class="btn g" href="mailto:${esc(l.email)}">Email</a>`:''}<button class="btn g" onclick="go('tl','${id}')">Full timeline</button></div>
+ ${ed?`<select id="ds" onchange="chStatus('${id}',this.value)">${opt(statuses.map(s=>[s.id,s.name]),l.status_id)}</select><div id="hint"></div><b>Schedule follow-up</b><input id="fd" type="datetime-local" value="${tmr()}"><select id="ft">${opt(Object.keys(TY))}</select><input id="fnt" placeholder="Task notes"><button class="btn w" onclick="addFu('${id}')">Add follow-up</button><br><br><b>Add note</b><input id="nt" placeholder="Write a note"><button class="btn w" onclick="addNote('${id}')">Save note</button>`:''}
+ <h4>Activity timeline</h4><div class="tl" id="tl"><small class="mut">Loading…</small></div>`);tline(id)}
+function tline(id){run(async()=>{const a=(await api.acts(id));$('tl').innerHTML=a.map(x=>`<div>${ICO[x.kind]||'•'} ${esc(label(x))}<br><small>${esc(x.profiles?.full_name||'System')} · ${fmt(x.created_at)}</small></div>`).join('')||'<small class="mut">No activity yet.</small>'})}
+function chStatus(id,sid){run(async()=>{await api.setStatus(id,sid);const n=statuses.find(s=>s.id===sid).name,l=S.all.find(x=>x.id===id);if(l)l.status_id=sid;if(/^(Interested|Highly Interested|Follow-up Required)$/.test(n))$('hint').innerHTML='<p class="badge warn">Marked '+esc(n)+'. Schedule the next follow-up below.</p>';toast('Status updated.');tline(id)})}
+function addFu(id){run(async()=>{const v=$('fd').value;if(!v)throw new Error('Pick a date and time.');await api.addFu({lead_id:id,due_at:new Date(v).toISOString(),type:$('ft').value,notes:$('fnt').value});toast('Follow-up scheduled.');tline(id)})}
+function addNote(id){run(async()=>{const t=$('nt').value.trim();if(!t)return;await api.note(id,t);$('nt').value='';toast('Note saved.');tline(id)})}
+
+/* --- Follow-ups (list + calendar) --- */
+S.fv=S.fv||'list';S.wk=0;
+async function vFus(){const all=(await api.allFus()).filter(f=>f.lead_id?(!f.leads||vis(f.leads)):(me.role!=='sales'||(f.owner_id||me.id)===me.id)),acts=await api.allActs(),ln={};acts.filter(a=>a.kind==='note_added').forEach(a=>{if(!ln[a.lead_id])ln[a.lead_id]=a.detail?.text});S.fuRows=all;if(!S.all)S.all=await api.all();
+ const tabs=[['today','Today'],['upcoming','Upcoming'],['overdue','Overdue'],['done','Completed']],pend=all.filter(f=>f.status==='pending'),od=pend.filter(f=>over(f.due_at));
+ const card=f=>`<div class="card"><div class="row"><b>${esc(f.leads?.name||f.title||'Team task')}</b><span class="badge" style="background:${TY[f.type]||'#ddd'}22;color:${TY[f.type]||'#333'}">${esc(f.type)}</span></div><small class="${f.status==='pending'&&over(f.due_at)?'over':''}">${fmt(f.due_at)}</small> · <small>Owner: ${esc(f.leads?own(f.leads):tn(f.owner_id))}</small>${(ln[f.lead_id]||f.notes)?`<br><small>Last note: ${esc(ln[f.lead_id]||f.notes)}</small>`:''}${f.outcome?`<br><small>Outcome: ${esc(f.outcome)}</small>`:''}${f.status==='pending'&&canEdit()?`<div class="acts" style="margin-top:8px">${f.leads?.phone?`<a class="btn g" href="tel:${esc(f.leads.phone)}" onclick="logAct('${f.lead_id}','call_made',{})">📞 Call</a><a class="btn g" target="_blank" rel="noopener" href="${wa(f.leads)}" onclick="logAct('${f.lead_id}','wa_sent',{})">💬 WhatsApp</a>`:''}<button class="btn g" onclick="doneFu('${f.id}')">Complete</button><button class="btn g" onclick="reFu('${f.id}')">Reschedule</button></div>`:''}</div>`;
+ let body;if(S.fv==='list'){const r=all.filter(f=>inTab(f,S.fu)).sort((a,b)=>a.due_at.localeCompare(b.due_at));body=`<div class="chips">${tabs.map(([k,l])=>chip(S.fu===k,`S.fu='${k}';vFus()`,l+' ('+all.filter(f=>inTab(f,k)).length+')')).join('')}</div>`+(r.map(card).join('')||'<p class="mut">Nothing here. Schedule follow-ups from a lead.</p>')}
+ else{const m=new Date();m.setHours(0,0,0,0);m.setDate(m.getDate()-((m.getDay()+6)%7)+S.wk*7);const days=[...Array(7)].map((_,i)=>{const d=new Date(m);d.setDate(m.getDate()+i);return d});
+  body=`<div class="row" style="margin-bottom:8px"><button class="btn g" onclick="S.wk--;vFus()">‹ Prev</button><b>Week of ${days[0].toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</b><button class="btn g" onclick="S.wk++;vFus()">Next ›</button></div><div class="cal">${days.map(d=>`<div><h5 class="${dday(d)===dday(new Date())?'td':''}">${d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric'})}</h5>${all.filter(f=>dday(f.due_at)===dday(d)).sort((a,b)=>a.due_at.localeCompare(b.due_at)).map(f=>`<div class="ev ${f.status==='pending'&&over(f.due_at)?'od':''} ${f.status==='completed'?'dn':''}" style="--c:${TY[f.type]||'#999'}" ${f.lead_id?`onclick="openLead('${f.lead_id}')"`:''}><time>${new Date(f.due_at).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})}</time><b>${esc(f.type)}</b>${esc(f.leads?.name||f.title||'')}</div>`).join('')}</div>`).join('')}</div>`}
+ M(`${head('Follow-ups',`${chip(S.fv==='list',"S.fv='list';vFus()",'List')}${chip(S.fv==='cal',"S.fv='cal';vFus()",'📅 Calendar')}`)}<div class="kpis">${kpi('Pending',pend.length)}${kpi('Overdue',od.length,'er')}${kpi('Completed',all.length-pend.length,'ok')}</div>${body}`)}
+function doneFu(id){sheet(`<h3>Complete follow-up</h3><select id="oc">${opt(OUTCOMES)}</select><input id="on" placeholder="Call notes (optional)"><b>Next follow-up (optional)</b><input id="nd" type="datetime-local"><button class="btn w" onclick="finishFu('${id}')">Save outcome</button><p class="mut" style="text-align:center" onclick="closeSheet()">Cancel</p>`)}
+function finishFu(id){run(async()=>{const f=S.fuRows.find(x=>x.id===id);await api.doneFu(id,$('oc').value,$('on').value.trim());const nd=$('nd').value;if(nd)await api.addFu({lead_id:f.lead_id,due_at:new Date(nd).toISOString(),type:'call',notes:'',...(f.lead_id?{}:{title:f.title,owner_id:f.owner_id})});closeSheet();toast('Follow-up completed.');vFus()})}
+function reFu(id){sheet(`<h3>Reschedule</h3><input id="rd" type="datetime-local" value="${tmr()}"><button class="btn w" onclick="saveRe('${id}')">Save new time</button><p class="mut" style="text-align:center" onclick="closeSheet()">Cancel</p>`)}
+function saveRe(id){run(async()=>{const v=$('rd').value;if(!v)throw new Error('Pick a date and time.');await api.resched(id,new Date(v).toISOString());closeSheet();toast('Follow-up rescheduled.');vFus()})}
+/* --- Reports --- */
+const R={from:'',to:'',source:'',owner:'',stage:'',per:'month'};
+async function vRep(){const all=(await api.all()).filter(vis),L=all.filter(l=>(!R.from||l.created_at.slice(0,10)>=R.from)&&(!R.to||l.created_at.slice(0,10)<=R.to)&&(!R.source||l.source===R.source)&&(!R.owner||(l.owner_id||me.id)===R.owner)&&(!R.stage||l.status_id===R.stage)),W=L.filter(isWon),rev=W.reduce((a,l)=>a+Number(l.deal_value||0),0),fc=k=>`onchange="R.${k}=this.value;vRep()"`;
+ const srcs=[...new Set([...SET.sources,...L.map(l=>l.source).filter(Boolean)])],has=re=>L.filter(l=>re.test(sname(l))).length,
+ fun=[['New',L.length],['Contacted',L.filter(l=>!/^(New Lead|Not Contacted)$/.test(sname(l))).length],['Interested',has(/Interested|Follow|Meeting|Demo|Proposal|Negotiation|Won/)-has(/Not Interested/)],['Won',W.length],['Lost',L.filter(isLost).length]],
+ key=d=>{const x=new Date(d);return R.per==='day'?x.toISOString().slice(0,10):R.per==='week'?(()=>{const m=new Date(x);m.setDate(x.getDate()-((x.getDay()+6)%7));return'Wk '+m.toISOString().slice(0,10)})():x.toISOString().slice(0,7)},ra={};W.forEach(l=>{const k=key(l.won_at||l.updated_at||l.created_at);ra[k]=(ra[k]||0)+Number(l.deal_value||0)});
+ const tb=(h,r)=>`<div class="tw"><table class="tbl"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+ M(`${head('Reports',canExp()?'<button class="btn g" onclick="expRep()">Export report</button>':'')}<div class="flt"><input type="date" value="${R.from}" ${fc('from')}><input type="date" value="${R.to}" ${fc('to')}><select ${fc('source')}>${opt(srcs,R.source,'All sources')}</select><select ${fc('owner')}>${opt(team().map(t=>[t.id,t.name]),R.owner,'All owners')}</select><select ${fc('stage')}>${opt(statuses.map(s=>[s.id,s.name]),R.stage,'All stages')}</select></div>
+ <div class="kpis">${kpi('Total leads',L.length)}${kpi('Won leads',W.length,'ok')}${kpi('Conversion',pct(W.length,L.length))}${kpi('Won value',money(rev),'ok')}</div>
+ <div class="grid"><div class="card"><h3>Stage funnel</h3>${bars(Object.fromEntries(fun))}</div><div class="card"><h3>Revenue won <select style="width:auto;display:inline;margin:0 0 0 8px;padding:4px" onchange="R.per=this.value;vRep()">${opt(['day','week','month'],R.per)}</select></h3>${bars(Object.fromEntries(Object.entries(ra).sort().map(([k,v])=>[k,Math.round(v)])))}</div></div>
+ <h3>Source performance</h3>${tb(['Source','Leads','Won','Conversion','Won value'],srcs.map(s=>{const m=L.filter(l=>l.source===s),w=m.filter(isWon);return[esc(s),m.length,w.length,pct(w.length,m.length),money(w.reduce((a,l)=>a+Number(l.deal_value||0),0))]}))}<h3 style="margin-top:16px">Owner performance</h3>${tb(['Owner','Assigned','Won','Conversion','Won value'],ownerStats(L).map(o=>[esc(o.t.name),o.n,o.w,pct(o.w,o.n),money(o.rev)]))}`);window._rl=L}
+const expRep=()=>dl([['Name','Source','Stage','Owner','Deal value','Created'],...window._rl.map(l=>[l.name,l.source,sname(l),own(l),l.deal_value,l.created_at])],'report.csv');
+
+/* --- Team leaderboard (fair ranking) --- */
+const B={sort:'cv',from:'',to:''};
+async function vBoard(){const L=(await api.all()).filter(l=>(!B.from||l.created_at.slice(0,10)>=B.from)&&(!B.to||l.created_at.slice(0,10)<=B.to)),o=ownerStats(L).filter(x=>x.t.role!=='viewer').sort((a,b)=>B.sort==='w'?b.w-a.w:B.sort==='rev'?b.rev-a.rev:b.cv-a.cv||b.w-a.w);
+ M(`${head('Team Leaderboard')}<div class="flt"><input type="date" value="${B.from}" onchange="B.from=this.value;vBoard()"><input type="date" value="${B.to}" onchange="B.to=this.value;vBoard()"><select onchange="B.sort=this.value;vBoard()">${opt([['cv','Sort: conversion rate'],['w','Sort: won deals'],['rev','Sort: revenue']],B.sort)}</select></div><p class="note">Fair ranking: default is conversion rate, so people with fewer leads aren't unfairly ranked below those with more. Under 3 leads shows "low volume".</p>${mng()?`<div class="card"><h3>Add team member</h3><div class="flt"><input id="bn" placeholder="Name"><input id="bd" placeholder="Designation"><button class="btn" onclick="addMember()">+ Add member</button></div></div>`:''}
+ <div class="tw"><table class="tbl"><thead><tr><th>Rank</th><th>Salesperson</th><th>Assigned</th><th>Contacted</th><th>Won</th><th>Lost</th><th>Conversion</th><th>Won revenue</th><th>Target</th><th></th></tr></thead><tbody>${o.map((x,i)=>{const p=x.t.target?Math.min(100,x.rev/x.t.target*100):0;return`<tr><td>${['🥇','🥈','🥉'][i]||i+1}</td><td><b>${esc(x.t.name)}</b><br><small>${esc(x.t.title||x.t.role)}</small>${x.n<3?' <span class="badge warn">low volume</span>':''}</td><td>${x.n}</td><td>${x.c}</td><td>${x.w}</td><td>${x.lo}</td><td>${x.cv.toFixed(1)}%</td><td>${money(x.rev)}</td><td><div class="prg"><i style="width:${p}%"></i></div><small>${money(x.rev)} / ${money(x.t.target)}</small></td><td>${mng()&&x.t.id!==me.id?`<button class="ia" title="Remove from team" onclick="rmMember('${x.t.id}')">✕</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`)}
+
+/* --- Lead assignment --- */
+async function vAssign(){S.all=await api.all();const w=t=>S.all.filter(l=>(l.owner_id||me.id)===t&&!isWon(l)&&!isLost(l)).length,mem=team().filter(t=>t.role!=='viewer');
+ M(`${head('Lead Assignment')}<div class="grid"><div class="card"><div class="row2"><span><b>Round-robin assignment</b><br><small>New leads rotate between active members: A → B → C → A. Inactive members are skipped; every assignment is recorded.</small></span>${sw(SET.rr,"SET.rr=this.checked;save();vAssign()")}</div><label>Default owner</label><select onchange="SET.def=this.value;save()">${opt(mem.map(t=>[t.id,t.name]),SET.def==='me'?me.id:SET.def)}</select><p class="mut">Applies to website enquiries, Excel imports and manual leads alike.</p></div>
+ <div class="card"><h3>Source rules</h3><small class="mut">Send leads from a source to one person (overrides round-robin).</small>${SET.sources.map(s=>`<div class="row2"><span>${esc(s)}</span><select style="width:55%;margin:0" onchange="SET.rules['${esc(s)}']=this.value;if(!this.value)delete SET.rules['${esc(s)}'];save()">${opt(mem.map(t=>[t.id,t.name]),SET.rules[s],'Use round-robin')}</select></div>`).join('')}</div></div>
+ <h3>Team availability & workload</h3><div class="tw"><table class="tbl"><thead><tr><th>Member</th><th>Role</th><th>Open leads</th><th>Available</th></tr></thead><tbody>${mem.map(t=>`<tr><td>${esc(t.name)}</td><td>${t.role}</td><td>${w(t.id)}</td><td>${sw(!SET.inactive[t.id],`SET.inactive['${t.id}']=!this.checked;save()`)}</td></tr>`).join('')}</tbody></table></div>
+ <div class="grid" style="margin-top:14px"><div class="card"><h3>Manual reassignment</h3><select id="ml">${opt(S.all.filter(vis).map(l=>[l.id,l.name+' → '+own(l)]))}</select><select id="mo">${opt(pool().map(t=>[t.id,t.name]))}</select><button class="btn w" ${canEdit()?'':'disabled'} onclick="run(async()=>{await api.assign([$('ml').value],$('mo').value);toast('Reassigned.');vAssign()})">Reassign</button></div>
+ <div class="card"><h3>⚠️ Failure alerts</h3>${D.alerts.slice(0,5).map(a=>`<div class="row2"><small>${esc(a.msg)}<br>${fmt(a.at)}</small></div>`).join('')||'<p class="mut">No assignment failures.</p>'}</div></div>
+ <h3>Assignment history</h3><div class="tw"><table class="tbl"><thead><tr><th>When</th><th>Lead</th><th>Assigned to</th><th>Method</th></tr></thead><tbody>${D.alog.slice(0,30).map(a=>`<tr><td>${fmt(a.at)}</td><td>${esc(a.lead)}</td><td>${esc(a.to)}</td><td>${esc(a.how)}</td></tr>`).join('')||'<tr><td colspan="4" class="mut">No assignments yet.</td></tr>'}</tbody></table></div>`)}
+
+/* --- Website enquiries --- */
+async function vWeb(){const base=location.href.split('#')[0].split('?')[0],p=new URLSearchParams(location.search),U=Object.keys(SET.utm).filter(k=>SET.utm[k]);
+ M(`${head('Website Enquiries','<span class="badge ok">● Form active</span><span class="badge warn">Embed not yet verified</span>')}<div class="grid"><div class="card"><h3>Lead form URL & embed</h3><code>${esc(base)}?form=1</code><p class="mut">Embed code (once this CRM is hosted with Supabase keys, point the form to its endpoint):</p><pre class="code">${esc(`<iframe src="${base}?form=1&utm_source=website" width="100%" height="520" style="border:0"></iframe>`)}</pre><button class="btn g" onclick="navigator.clipboard&&navigator.clipboard.writeText('${esc(base)}?form=1');toast('URL copied.')">Copy URL</button></div>
+ <div class="card"><h3>Preview form</h3><input id="wn" placeholder="Name *"><input id="wp" type="tel" placeholder="Phone *"><input id="we" type="email" placeholder="Email"><input id="wc" placeholder="Company"><textarea id="wm" rows="2" placeholder="Enquiry"></textarea>${U.map(k=>`<input type="hidden" class="wu" data-k="${k}" value="${esc(p.get(k)||'')}">`).join('')}<small class="mut">Hidden UTM fields captured: ${U.join(', ')||'none'} · Source: Website · auto-assigned by the same service</small><br><br><button class="btn w" onclick="subWeb(0)">Submit enquiry</button><br><br><button class="btn g w" onclick="subWeb(1)">Run test submission</button></div></div>`)}
+function subWeb(test){run(async()=>{const utm={};document.querySelectorAll('.wu').forEach(i=>utm[i.dataset.k]=i.value||(test?'test-'+i.dataset.k.slice(4):''));const d=test?{name:'Test Enquiry '+Date.now().toString().slice(-4),phone:'+9199'+Math.floor(1e8+Math.random()*9e8),email:'',company:'Test Co'}:{name:$('wn').value.trim(),phone:$('wp').value.trim(),email:$('we').value.trim(),company:$('wc').value.trim()};
+ if(!d.name||!d.phone)throw new Error('Name and phone are required.');const id=await api.addLead({...d,source:'Website',utm});if(!test&&$('wm').value.trim())await api.note(id,$('wm').value.trim());toast(test?'Test lead created ✔ (check Leads)':'Enquiry captured and assigned.')})}
+
+/* --- Activity timeline --- */
+const T={lead:'',kind:''};
+async function vTl(id){if(id)T.lead=id;const A=await api.allActs(),L=(await api.all()).filter(vis),ok=new Set(L.map(l=>l.id)),r=A.filter(a=>ok.has(a.lead_id)&&(!T.lead||a.lead_id===T.lead)&&(!T.kind||a.kind===T.kind)).slice(0,100);
+ M(`${head('Activity Timeline')}<div class="flt"><select onchange="T.lead=this.value;vTl()">${opt(L.map(l=>[l.id,l.name]),T.lead,'All leads')}</select><select onchange="T.kind=this.value;vTl()">${opt(Object.keys(ICO).map(k=>[k,label({kind:k,detail:{}}).split(':')[0]||k]),T.kind,'All events')}</select></div><p class="mut">History is append-only: events cannot be edited or deleted.</p><div class="tl2">${r.map(a=>`<div data-i="${ICO[a.kind]||'•'}"><b>${esc(label(a))}</b><br><small>${esc(a.leads?.name||'')} · ${esc(a.profiles?.full_name||'System')} · ${fmt(a.created_at)}</small></div>`).join('')||'<p class="mut">No events.</p>'}</div>`)}
+
+/* --- Import / Export --- */
+const IM={step:1,head:[],rows:[],map:{},own:'rr',res:null,fu:{on:true,at:tmr(),type:'call',gap:10,notes:'First call after import'}},FLD=[['name','Name *'],['phone','Phone'],['email','Email'],['company','Company'],['source','Source'],['deal_value','Deal value']];
+function parseCSV(t){const r=[];let c=[],f='',q=false;for(let i=0;i<t.length;i++){const x=t[i];if(q){if(x=='"'&&t[i+1]=='"'){f+='"';i++}else if(x=='"')q=false;else f+=x}else if(x=='"')q=true;else if(x==','){c.push(f);f=''}else if(x=='\n'||x=='\r'){if(x=='\r'&&t[i+1]=='\n')i++;c.push(f);f='';r.push(c);c=[]}else f+=x}if(f||c.length){c.push(f);r.push(c)}return r.filter(x=>x.some(v=>v.trim()))}
+function vImp(){const st=['Upload','Map columns','Validate','Duplicates','Assign','Result'];
+ const bar=`<div class="stp">${st.map((s,i)=>`<span class="${IM.step===i+1?'on':IM.step>i+1?'dn':''}" ${IM.step>i+1&&IM.step<6?`onclick="IM.step=${i+1};vImp()" style="cursor:pointer" title="Go back to this step"`:''}>${i+1}. ${s}</span>`).join('')}</div>`;let b='';
+ if(IM.step===1)b=`<div class="card"><h3>1. Upload Excel or CSV</h3><input type="file" id="fi" accept=".csv,.xlsx,.xls" onchange="impFile(this.files[0])"><button class="btn g" onclick="dl([['name','phone','email','company','source','deal_value'],['Sample Lead','9876543210','sample@mail.com','Sample Co','Website','50000']],'lead-template.csv')">Download template</button></div>`;
+ else if(IM.step===2)b=`<div class="card"><h3>2. Map spreadsheet columns (${IM.rows.length} rows)</h3>${FLD.map(([k,l])=>`<label>${l}</label><select onchange="IM.map['${k}']=this.value">${opt(IM.head.map((h,i)=>[String(i),h]),IM.map[k],'— skip —')}</select>`).join('')}<br><button class="btn" onclick="impCheck()">Next: validate</button></div>`;
+ else if(IM.step===3||IM.step===4){const c=IM.chk;b=`<div class="kpis">${kpi('Valid',c.ok.length,'ok')}${kpi('Invalid',c.bad.length,'er')}${kpi('Duplicates',c.dup.length)}</div><div class="card"><h3>${IM.step===3?'3. Preview & validate':'4. Duplicates & errors'}</h3>${(IM.step===3?c.ok.slice(0,8):[...c.bad,...c.dup].slice(0,12)).map(r=>`<div class="row2"><span>${esc(r.name||'(no name)')} <small>${esc(r.phone||r.email||'')}</small></span><small class="${r.why?'err':''}">${esc(r.why||'ok')}</small></div>`).join('')||'<p class="mut">None 🎉</p>'}<br><button class="btn" onclick="IM.step++;vImp()">Next</button></div>`}
+ else if(IM.step===5)b=`<div class="card"><h3>5. Assign owners</h3><select onchange="IM.own=this.value">${opt([['rr','Use assignment rules / round-robin'],...pool().map(t=>[t.id,'All to '+t.name])],IM.own)}</select><div class="row2"><span><b>Create a follow-up for every imported lead</b></span>${sw(IM.fu.on,"IM.fu.on=this.checked;vImp()")}</div>${IM.fu.on?`<label>First follow-up</label><input type="datetime-local" value="${IM.fu.at}" onchange="IM.fu.at=this.value"><label>Type</label><select onchange="IM.fu.type=this.value">${opt(Object.keys(TY),IM.fu.type)}</select><label>Minutes between each lead</label><input type="number" min="0" value="${IM.fu.gap}" onchange="IM.fu.gap=+this.value"><input placeholder="Follow-up note" value="${esc(IM.fu.notes)}" onchange="IM.fu.notes=this.value">`:''}<br><button class="btn" onclick="impRun()">Import ${IM.chk.ok.length} leads</button></div>`;
+ else b=`<div class="kpis">${kpi('Imported',IM.res.ok,'ok')}${kpi('Skipped',IM.res.skip)}${kpi('Duplicate',IM.res.dup)}${kpi('Invalid',IM.res.bad,'er')}${kpi('Follow-ups set',IM.res.fu||0)}</div><button class="btn" onclick="IM.step=1;vImp()">Import another file</button> <button class="btn g" onclick="go('leads')">View leads</button>`;
+ M(`${head('Import / Export')}${canEdit()?bar+b:'<p class="note">Your role is read-only.</p>'}<div class="card" style="margin-top:14px"><h3>Export</h3><p class="mut">Exports respect your role and active filters on the Leads page.</p><button class="btn g" ${canExp()?'':'disabled'} onclick="api.all().then(a=>{S.all=a.filter(vis);expLeads()})">Export leads (${canExp()?'allowed':'admin/manager only'})</button></div>`)}
+async function impFile(f){if(!f)return;run(async()=>{S.all=await api.all();let rows;if(/\.csv$/i.test(f.name))rows=parseCSV(await f.text());else{if(!window.XLSX)await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=ok;s.onerror=()=>no(new Error('Could not load the Excel reader. Save as CSV and retry.'));document.head.appendChild(s)});const w=XLSX.read(await f.arrayBuffer());rows=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1,defval:''}).filter(r=>r.some(v=>String(v).trim()))}
+ if(rows.length<2)throw new Error('The file has no data rows.');IM.head=rows[0].map(String);IM.rows=rows.slice(1);IM.map={};FLD.forEach(([k])=>{const i=IM.head.findIndex(h=>h.toLowerCase().replace(/[^a-z]/g,'').includes(k==='deal_value'?'value':k));if(i>=0)IM.map[k]=String(i)});IM.step=2;vImp()})}
+function impCheck(){if(!IM.map.name)return toast('Map the Name column.');const g=(r,k)=>IM.map[k]!==undefined&&IM.map[k]!==''?String(r[IM.map[k]]??'').trim():'',seen=new Set(),ex=new Set(S.all?.flatMap(l=>[l.phone,l.email&&l.email.toLowerCase()])||[]),c={ok:[],bad:[],dup:[]};
+ IM.rows.forEach(r=>{const o={name:g(r,'name'),phone:g(r,'phone').replace(/[^\d+]/g,''),email:g(r,'email'),company:g(r,'company'),source:g(r,'source')||'Excel import',deal_value:g(r,'deal_value')};if(o.phone&&/^\d{10}$/.test(o.phone))o.phone='+91'+o.phone;
+ if(!o.name)return c.bad.push({...o,why:'Missing name'});if(!o.phone&&!o.email)return c.bad.push({...o,why:'Needs phone or email'});if(o.phone&&!/^\+?\d{10,14}$/.test(o.phone))return c.bad.push({...o,why:'Invalid phone'});if(o.email&&!EMAIL.test(o.email))return c.bad.push({...o,why:'Invalid email'});
+ const k=[o.phone,o.email&&o.email.toLowerCase()].filter(Boolean);if(k.some(x=>ex.has(x)||seen.has(x)))return c.dup.push({...o,why:'Duplicate'});k.forEach(x=>seen.add(x));c.ok.push(o)});IM.chk=c;IM.step=3;vImp()}
+function impRun(){run(async()=>{const r={ok:0,skip:0,fu:0,dup:IM.chk.dup.length,bad:IM.chk.bad.length};let i=0;for(const o of IM.chk.ok){try{const id=await api.addLead({...o,deal_value:o.deal_value?Number(o.deal_value):null,owner_id:IM.own==='rr'?undefined:IM.own});await logAct(id,'imported',{});r.ok++;if(IM.fu.on&&IM.fu.at){await api.addFu({lead_id:id,due_at:new Date(new Date(IM.fu.at).getTime()+i*IM.fu.gap*6e4).toISOString(),type:IM.fu.type,notes:IM.fu.notes});r.fu++}i++}catch(e){r.skip++}}IM.res=r;IM.step=6;vImp()})}
+
+/* --- Team members --- */
+async function vTeam(){S.all=await api.all();const adm=me.role==='admin';
+ M(`${head('Team Members')}${adm&&!LIVE?`<div class="card"><h3>Invite team member</h3><div class="flt"><input id="tnm" placeholder="Name"><input id="ttl" placeholder="Designation"><input id="tem" type="email" placeholder="Email"><select id="trl">${opt(['manager','sales','viewer'])}</select><button class="btn" onclick="invite()">Send invite</button></div></div>`:`<p class="note">${LIVE?'Invite users from Supabase Auth; they appear here once they sign in.':'Only admins can invite.'}</p>`}
+ <div class="tw"><table class="tbl"><thead><tr><th>Name</th><th>Designation</th><th>Email</th><th>Role</th><th>Active</th><th>Leads</th><th>Last login</th></tr></thead><tbody>${team().map(t=>`<tr><td><b>${esc(t.name)}</b></td><td>${esc(t.title||'')}</td><td>${esc(t.email)}</td><td>${adm&&!LIVE&&t.id!==me.id?`<select style="margin:0" onchange="D.team.find(x=>x.id==='${t.id}').role=this.value;save();vTeam()">${opt(['manager','sales','viewer'],t.role)}</select>`:t.role}</td><td>${sw(!SET.inactive[t.id],`SET.inactive['${t.id}']=!this.checked;save()`)}</td><td>${S.all.filter(l=>(l.owner_id||me.id)===t.id).length}</td><td>${fmt(t.login)}</td></tr>`).join('')}</tbody></table></div>
+ <div class="grid" style="margin-top:14px"><div class="card"><h3>Roles & permissions</h3><p><b>Admin</b> — all settings, reports and leads.</p><p><b>Manager</b> — team leads, assignment, team reports, export.</p><p><b>Salesperson</b> — only their assigned leads, notes and follow-ups.</p><p><b>Viewer</b> — read-only access.</p></div></div>`)}
+function invite(){const n=$('tnm').value.trim(),e=$('tem').value.trim();if(!n||!EMAIL.test(e))return toast('Enter a name and valid email.');D.team.push({id:'t'+uid(),name:n,title:$('ttl').value.trim(),email:e,role:$('trl').value,target:100000,login:null});save();toast('Invite recorded (demo).');vTeam()}
+
+/* --- Settings --- */
+async function vSet(){const st=(on,t)=>`<span class="badge ${on?'ok':'warn'}">${t}</span>`;
+ M(`${head('Settings')}<details class="card" open><summary>Lead stages & status labels</summary>${statuses.map(s=>`<span class="badge ${sc(s.name)}">${esc(s.name)}</span>`).join('')}<p class="mut">${LIVE?'Stages are stored in your Supabase lead_statuses table.':'Demo stages are fixed; with Supabase connected, edit the lead_statuses table.'}</p></details>
+ <details class="card"><summary>Lead sources</summary>${SET.sources.map((s,i)=>`<span class="pill">${esc(s)}<a onclick="SET.sources.splice(${i},1);save();vSet()">✕</a></span>`).join('')}<div class="flt" style="margin-top:8px"><input id="ns2" placeholder="New source"><button class="btn" onclick="const v=$('ns2').value.trim();if(v&&!SET.sources.includes(v)){SET.sources.push(v);save();vSet()}">Add</button></div></details>
+ <details class="card"><summary>Assignment rules</summary><div class="row2"><span>Round-robin ${st(SET.rr,SET.rr?'On':'Off')}</span><button class="btn g" onclick="go('assign')">Configure</button></div></details>
+ <details class="card"><summary>Follow-up reminders</summary><div class="row2"><span>In-app reminders</span>${sw(SET.remind,'SET.remind=this.checked;save()')}</div><label>Remind this many minutes before due</label><input type="number" min="0" value="${SET.remMin}" onchange="SET.remMin=+this.value;save()"><button class="btn g" onclick="window.Notification&&Notification.requestPermission().then(p=>toast('Notifications: '+p))">Enable browser notifications</button></details>
+ <details class="card"><summary>Website form integration</summary><div class="row2"><span>Form endpoint</span>${st(1,'Configured')}</div><button class="btn g" onclick="go('web')">Open form settings</button></details>
+ <details class="card"><summary>UTM attribution</summary>${Object.keys(SET.utm).map(k=>`<div class="row2"><code style="display:inline;margin:0">${k}</code>${sw(SET.utm[k],`SET.utm['${k}']=this.checked?1:0;save()`)}</div>`).join('')}<p class="mut">Original source is preserved even if a salesperson edits the lead.</p></details>
+ <details class="card"><summary>WhatsApp & calling</summary><div class="row2"><span>WhatsApp click-to-chat</span>${sw(SET.wab,'SET.wab=this.checked?1:0;save()')}${st(SET.wab,SET.wab?'Connected':'Off')}</div><div class="row2"><span>Phone dialer (tel:)</span>${sw(SET.call,'SET.call=this.checked?1:0;save()')}${st(SET.call,SET.call?'Connected':'Off')}</div><label>Default WhatsApp message ({name} = lead name)</label><textarea rows="2" onchange="SET.wa=this.value;save()">${esc(SET.wa)}</textarea></details>
+ <details class="card"><summary>Data export & security</summary><div class="row2"><span>Only admin/manager can export</span>${sw(SET.reqAdmin,'SET.reqAdmin=this.checked?1:0;save()')}</div>${LIVE?'':'<button class="btn g" onclick="if(confirm(\'Reset all demo data?\')){localStorage.removeItem(\'telecrm_demo\');location.reload()}">Reset demo data</button>'}</details>`)}
+
+boot();
+
+</script></body></html>
